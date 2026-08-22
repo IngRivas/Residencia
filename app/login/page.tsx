@@ -23,18 +23,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
 
   const [loading, setLoading] = useState(false)
-  const [isDesktop, setIsDesktop] = useState(false)
   const router = useRouter()
-
-  useEffect(() => {
-    // Solo carga el video si la pantalla es de tamaño tablet o superior
-    const mediaQuery = window.matchMedia("(min-width: 768px)")
-    setIsDesktop(mediaQuery.matches)
-
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
-    mediaQuery.addEventListener("change", handler)
-    return () => mediaQuery.removeEventListener("change", handler)
-  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,10 +38,15 @@ export default function LoginPage() {
       })
 
       if (result?.error) {
-        if (result.error === "Configuration" || result.error === "OUT_OF_HOURS") {
+        if (result.error === "OUT_OF_HOURS") {
           sileo.info({
             title: "Recuerda",
             description: "Estás intentando entrar fuera de horario laboral.",
+          })
+        } else if (result.error === "Configuration") {
+          sileo.error({
+            title: "Error de Servidor",
+            description: "No se pudo conectar a la base de datos o hay un error de configuración.",
           })
         } else {
           sileo.error({
@@ -77,21 +71,8 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-4">
-      {/* Background Video - Renderizado condicional para ahorrar datos en móvil */}
-      {isDesktop && (
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 z-0 h-full w-full object-cover opacity-50"
-        >
-          <source
-            src="https://wp.mcacorporation.com/api/wp-content/uploads/2026/05/INICIO_vp6xbo.mp4"
-            type="video/mp4"
-          />
-        </video>
-      )}
+      {/* Dynamic Background Pattern */}
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/20 via-background to-background"></div>
 
       {/* Overlay to ensure text readability */}
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-background/80 via-background/40 to-background/90"></div>
@@ -99,16 +80,12 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-sm">
         {/* Logo / Brand */}
         <div className="mb-8 flex flex-col items-center gap-4">
-          <Image
-            src="/Logo MCA horizontal.svg"
-            alt="MCA Corporation"
-            width={220}
-            height={45}
-            className="mb-2 brightness-0 invert"
-          />
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-3xl font-black text-primary-foreground shadow-lg shadow-primary/20">
+            S
+          </div>
           <div className="space-y-1 text-center">
-            <h1 className="text-2xl font-black tracking-tight text-foreground">
-              MCA SPEND
+            <h1 className="text-3xl font-black tracking-tight text-foreground">
+              SPEND
             </h1>
             <h2 className="text-sm font-medium text-muted-foreground">
               Control de gastos
@@ -133,7 +110,7 @@ export default function LoginPage() {
             <input
               id="email"
               type="email"
-              placeholder="ejemplo@mcacorporation.com"
+              placeholder="jdeharo@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-full bg-muted px-5 py-3 text-sm text-foreground placeholder-slate-600 outline-none"
@@ -188,7 +165,7 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} MCA Corporation. Todos los derechos
+          © {new Date().getFullYear()} SPEND. Todos los derechos
           reservados.
         </div>
       </div>

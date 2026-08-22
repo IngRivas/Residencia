@@ -47,7 +47,6 @@ export default function AdminDock({
         ]
       : []),
     { href: "/admin/archivo", label: "Archivo de obras", icon: FolderArchive },
-    { href: "/admin/gastos", label: "Outlay", icon: ReceiptText },
     ...(["SUPER_ADMIN", "ADMIN"].includes(role)
       ? [{ href: "/admin/papelera", label: "Papelera", icon: Trash2 }]
       : []),

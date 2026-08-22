@@ -14,9 +14,8 @@ const bricolage = Bricolage_Grotesque({
 })
 
 export const metadata: Metadata = {
-  title: "MCA SPEND - MCA Corporation",
-  description:
-    "MCA SPEND - Sistema para la gestión y control de obras de construcción y gastos diarios.",
+  title: "SPEND",
+  description: "Sistema para la gestión y control de obras de construcción y gastos diarios.",
 }
 
 export default function RootLayout({

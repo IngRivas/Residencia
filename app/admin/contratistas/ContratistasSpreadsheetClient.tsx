@@ -461,13 +461,6 @@ export default function ContratistasSpreadsheetClient({
             Pagos a Contratistas
           </h1>
         </div>
-        <div className="flex items-center gap-3">
-          <a href="/admin/gastos">
-            <Button variant="secondary" className="rounded-xl px-6 shadow-sm border border-border/50 bg-muted/30">
-              Gastos Generales
-            </Button>
-          </a>
-        </div>
       </div>
 
       {/* Cards Section */}

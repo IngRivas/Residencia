@@ -22,7 +22,7 @@ async function main() {
   await prisma.role.deleteMany()
 
   // Hash passwords
-  const passwordHash = await bcrypt.hash("mcacorporation", 10)
+  const passwordHash = await bcrypt.hash("14102003", 10)
 
   // 1. Create Roles
   const superAdminRole = await prisma.role.create({
@@ -74,7 +74,7 @@ async function main() {
   const superadmin = await prisma.user.create({
     data: {
       name: "Juan Pérez (Super Admin)",
-      email: "superadmin@mcacorporation.com",
+      email: "jdeharo@gmail.com",
       password: passwordHash,
       roleId: superAdminRole.id,
     },
@@ -83,7 +83,7 @@ async function main() {
   const admin = await prisma.user.create({
     data: {
       name: "Carlos Mendoza (Admin)",
-      email: "admin@mcacorporation.com",
+      email: "admin@proyecto.com",
       password: passwordHash,
       roleId: adminRole.id,
     },
@@ -92,7 +92,7 @@ async function main() {
   const capturista = await prisma.user.create({
     data: {
       name: "Sofía Ruiz (Capturista)",
-      email: "capturista@mcacorporation.com",
+      email: "capturista@proyecto.com",
       password: passwordHash,
       roleId: capturistaRole.id,
     },
@@ -101,7 +101,7 @@ async function main() {
   const viewer = await prisma.user.create({
     data: {
       name: "Ing. Roberto Gómez (Viewer)",
-      email: "viewer@mcacorporation.com",
+      email: "viewer@proyecto.com",
       password: passwordHash,
       roleId: viewerRole.id,
     },
@@ -121,7 +121,7 @@ async function main() {
 
   const obra2 = await prisma.obra.create({
     data: {
-      nombre: "Plaza MCA Comercial",
+      nombre: "Plaza Central",
       presupuestoTotal: 1200000.0,
       estado: ObraEstado.ACTIVA,
       creadoPorId: superadmin.id,
@@ -288,7 +288,7 @@ async function main() {
     },
   })
 
-  // ==================== OBRA 2: PLAZA MCA COMERCIAL ====================
+  // ==================== OBRA 2: PLAZA CENTRAL ====================
 
   const day1Obra2 = await prisma.diaObra.create({
     data: {

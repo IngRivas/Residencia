@@ -645,3 +645,71 @@ export async function permanentDeleteDiaObraAdmin(diaObraId: string) {
   revalidatePath("/", "layout")
   return true
 }
+
+export async function verifyGastosBatchWithAI(obraId: string) {
+  const admin = await requireAdmin()
+  const { verifyExpenseWithAI } = await import("@/lib/ai-verifier")
+
+  // Obtener todos los gastos PENDIENTE de la obra con sus fotos
+  const gastosPendientes = await prisma.gasto.findMany({
+    where: {
+      diaObra: { obraId },
+      estado: "PENDIENTE",
+      deletedAt: null
+    },
+    include: {
+      fotos: true
+    }
+  })
+
+  let procesados = 0
+  let aprobados = 0
+  let rechazados = 0
+
+  for (const gasto of gastosPendientes) {
+    if (!gasto.fotos || gasto.fotos.length === 0) continue
+
+    const imageUrls = gasto.fotos.map(f => f.url)
+    const aiResult = await verifyExpenseWithAI(
+      {
+        concepto: gasto.concepto,
+        proveedor: gasto.proveedor,
+        total: Number(gasto.total),
+        subtotal: Number(gasto.subtotal),
+        iva: Number(gasto.iva)
+      },
+      imageUrls
+    )
+
+    const nuevoEstado = aiResult.valido ? GastoEstado.VERIFICADO : GastoEstado.RECHAZADO
+    const notaPrevia = gasto.notaAdmin ? gasto.notaAdmin + "\n\n" : ""
+    const nuevaNota = notaPrevia + (aiResult.valido ? "✨ Verificado por IA: " : "🤖 Rechazado por IA: ") + aiResult.razon
+
+    await prisma.gasto.update({
+      where: { id: gasto.id },
+      data: {
+        estado: nuevoEstado,
+        notaAdmin: nuevaNota
+      }
+    })
+
+    if (aiResult.valido) aprobados++
+    else rechazados++
+    procesados++
+  }
+
+  if (procesados > 0) {
+    const obra = await prisma.obra.findUnique({ where: { id: obraId } })
+    await logActivity(
+      admin.id!,
+      "VERIFICAR_GASTO",
+      "Gasto",
+      "BATCH_AI",
+      `Ejecutó verificación por IA en "${obra?.nombre || obraId}". Aprobados: ${aprobados}, Rechazados: ${rechazados}`
+    )
+  }
+
+  revalidatePath("/", "layout")
+  revalidatePath("/", "layout")
+  return { success: true, procesados, aprobados, rechazados }
+}
