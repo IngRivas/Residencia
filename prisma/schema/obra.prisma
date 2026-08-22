@@ -1,0 +1,37 @@
+model Obra {
+  id               String     @id @default(cuid())
+  nombre           String
+  presupuestoTotal Decimal
+  estado           ObraEstado @default(ACTIVA)
+  creadoPorId      String?
+  creadoPor        User?      @relation(fields: [creadoPorId], references: [id], onDelete: SetNull)
+  miembros         ObraUser[]
+  dias             DiaObra[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  deletedAt        DateTime?
+}
+
+model ObraUser {
+  id     String  @id @default(cuid())
+  obraId String
+  userId String
+  rol    ObraRol
+  obra   Obra    @relation(fields: [obraId], references: [id], onDelete: Cascade)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([obraId, userId])
+}
+
+enum ObraRol {
+  ADMIN
+  CAPTURISTA
+  VIEWER
+}
+
+enum ObraEstado {
+  ACTIVA
+  PAUSADA
+  ARCHIVADA
+  CERRADA
+}

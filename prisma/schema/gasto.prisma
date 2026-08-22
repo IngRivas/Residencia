@@ -1,0 +1,59 @@
+model DiaObra {
+  id                String    @id @default(cuid())
+  obraId            String
+  fecha             DateTime
+  presupuestoDiario Decimal
+  reposicion        Decimal   @default(0)
+  obra              Obra      @relation(fields: [obraId], references: [id], onDelete: Cascade)
+  gastos            Gasto[]
+  createdAt         DateTime  @default(now())
+  deletedAt         DateTime?
+
+  @@unique([obraId, fecha])
+}
+
+model Gasto {
+  id                  String        @id @default(cuid())
+  diaObraId           String
+  concepto            String
+  proveedor           String
+  porcentajeIVA       Decimal // 8.00 o 16.00
+  subtotal            Decimal
+  iva                 Decimal
+  total               Decimal
+  subtotal8           Decimal?
+  subtotal16          Decimal?
+  subtotal0           Decimal?
+  iva8                Decimal?
+  iva16               Decimal?
+  ieps                Decimal?
+  descuento           Decimal?
+  ivaRetenido         Decimal?
+  isrRetenido         Decimal?
+  notaCapturista      String?
+  notaAdmin           String? // Solo editable por ADMIN / SUPER_ADMIN
+  categoria           String?
+  isImprevisto        Boolean       @default(false)
+  noAfectaPresupuesto Boolean       @default(false)
+  estado              GastoEstado   @default(PENDIENTE)
+  fotos               FotoFactura[]
+  creadoPorId         String?
+  creadoPor           User?         @relation(fields: [creadoPorId], references: [id], onDelete: SetNull)
+  diaObra             DiaObra       @relation(fields: [diaObraId], references: [id], onDelete: Cascade)
+  createdAt           DateTime      @default(now())
+  deletedAt           DateTime?
+}
+
+model FotoFactura {
+  id       String @id @default(cuid())
+  gastoId  String
+  url      String // URL pública de Cloudinary
+  publicId String // public_id para eliminación en Cloudinary
+  gasto    Gasto  @relation(fields: [gastoId], references: [id], onDelete: Cascade)
+}
+
+enum GastoEstado {
+  PENDIENTE
+  VERIFICADO
+  RECHAZADO
+}

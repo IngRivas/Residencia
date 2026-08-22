@@ -1,0 +1,3322 @@
+Created At: 2026-07-24T21:02:37Z
+Completed At: 2026-07-24T21:02:37Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 1038
+Total Bytes: 39729
+Showing lines 1 to 100
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: "use client"
+2: 
+3: import React, { useState, useMemo, useTransition } from "react"
+4: import { Input } from "@/components/ui/input"
+5: import { Button } from "@/components/ui/button"
+6: import { DataTable, ColumnDef } from "@/app/components/DataTable"
+7: import { useSearchParams } from "next/navigation"
+8: import { Search, Plus, CalendarIcon, MoreVertical, LayoutGrid, List, FileText, ChevronDown, Check, Building, Layers, CircleDollarSign, Percent, Wallet, MessageSquare, Trash2, ArchiveRestore, User, Settings2, Filter, Loader2, LayoutPanelTop } from "lucide-react"
+9: import { ComboboxInput } from "@/components/ui/combobox-input"
+10: import { ObraSummaryCard } from "@/components/ui/obra-summary-card"
+11: import { formatCurrency } from "@/lib/formatters"
+12: import { sileo } from "sileo"
+13: import {
+14:   Select,
+15:   SelectContent,
+16:   SelectItem,
+17:   SelectTrigger,
+18:   SelectValue,
+19: } from "@/components/ui/select"
+20: import {
+21:   DropdownMenu,
+22:   DropdownMenuCheckboxItem,
+23:   DropdownMenuContent,
+24:   DropdownMenuGroup,
+25:   DropdownMenuTrigger,
+26: } from "@/components/ui/dropdown-menu"
+27: import {
+28:   Popover,
+29:   PopoverContent,
+30:   PopoverTrigger,
+31: } from "@/components/ui/popover"
+32: import { Calendar } from "@/components/ui/calendar"
+33: import { format } from "date-fns"
+34: import { es } from "date-fns/locale"
+35: import { cn } from "@/lib/utils"
+36: import { Label } from "@/components/ui/label"
+37: import { createGastoFromModule, deleteGastoFromModule } from "@/lib/actions/gastos-module"
+38: import { saveCardsObras } from "@/lib/actions/cards-module"
+39: import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+40: import { CardsCrudDialog } from "./CardsCrudDialog"
+41: 
+42: export interface GastoItem {
+43:   id: string
+44:   fecha: string
+45:   fechaFormatted: string
+46:   year: number
+47:   month: number
+48:   obraId: string
+49:   obraNombre: string
+50:   proveedor: string
+51:   concepto: string
+52:   categoria: string | null
+53:   subtotal: number
+54:   porcentajeIVA: number
+55:   iva: number
+56:   total: number
+57:   subtotal8?: number
+58:   subtotal16?: number
+59:   subtotal0?: number
+60:   iva8?: number
+61:   iva16?: number
+62:   ieps?: number
+63:   descuento?: number
+64:   ivaRetenido?: number
+65:   isrRetenido?: number
+66:   notaCapturista: string | null
+67:   creadoPorNombre: string
+68:   estado: string
+69: }
+70: 
+71: export interface ObraOption {
+72:   id: string
+73:   nombre: string
+74: }
+75: 
+76: export interface CardConfig {
+77:   id: string
+78:   type: "normal" | "custom"
+79:   obraId: string
+80:   keyword?: string
+81:   titulo?: string
+82:   isEnabled?: boolean
+83: }
+84: 
+85: interface GastosSpreadsheetClientProps {
+86:   initialGastos: GastoItem[]
+87:   obras: ObraOption[]
+88:   availableYears: number[]
+89:   initialCards?: any[]
+90: }
+91: 
+92: const MONTH_NAMES = [
+93:   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+94:   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+95: ]
+96: 
+97: export default function GastosSpreadsheetClient({
+98:   initialGastos,
+99:   obras,
+100:   availableYears,
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:02:57Z
+Completed At: 2026-07-24T21:02:57Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 1038
+Total Bytes: 39870
+Showing lines 40 to 140
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+40: import { CardsCrudDialog } from "./CardsCrudDialog"
+41: 
+42: export interface ContratistaGastoItem {
+43:   id: string
+44:   fecha: string
+45:   fechaFormatted: string
+46:   year: number
+47:   month: number
+48:   obraId: string
+49:   obraNombre: string
+50:   proveedor: string
+51:   concepto: string
+52:   categoria: string | null
+53:   subtotal: number
+54:   porcentajeIVA: number
+55:   iva: number
+56:   total: number
+57:   subtotal8?: number
+58:   subtotal16?: number
+59:   subtotal0?: number
+60:   iva8?: number
+61:   iva16?: number
+62:   ieps?: number
+63:   descuento?: number
+64:   ivaRetenido?: number
+65:   isrRetenido?: number
+66:   notaCapturista: string | null
+67:   creadoPorNombre: string
+68:   estado: string
+69: }
+70: 
+71: export interface ObraOption {
+72:   id: string
+73:   nombre: string
+74: }
+75: 
+76: export interface CardConfig {
+77:   id: string
+78:   type: "normal" | "custom"
+79:   obraId: string
+80:   keyword?: string
+81:   titulo?: string
+82:   isEnabled?: boolean
+83: }
+84: 
+85: interface ContratistasSpreadsheetClientProps {
+86:   initialGastos: ContratistaGastoItem[]
+87:   obras: ObraOption[]
+88:   availableYears: number[]
+89:   initialCards?: any[]
+90: }
+91: 
+92: const MONTH_NAMES = [
+93:   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+94:   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+95: ]
+96: 
+97: export default function ContratistasSpreadsheetClient({
+98:   initialGastos,
+99:   obras,
+100:   availableYears,
+101:   initialCards = [],
+102: }: ContratistasSpreadsheetClientProps) {
+103:   // Filter states
+104:   const [selectedYear, setSelectedYear] = useState<string>("all")
+105:   const [selectedMonth, setSelectedMonth] = useState<string>("all")
+106:   const [selectedObra, setSelectedObra] = useState<string>("all")
+107:   const [searchTerm, setSearchTerm] = useState<string>("")
+108:   
+109:   // Normalize initial cards (backwards compatibility for old string[] saves)
+110:   const normalizedCards = useMemo<CardConfig[]>(() => {
+111:     return initialCards.map(c => {
+112:       if (typeof c === "string") {
+113:         return { id: c, type: "normal", obraId: c, isEnabled: true }
+114:       }
+115:       return c as CardConfig
+116:     })
+117:   }, [initialCards])
+118: 
+119:   const [cards, setCards] = useState<CardConfig[]>(normalizedCards)
+120:   const [isCardsDialogOpen, setIsCardsDialogOpen] = useState(false)
+121: 
+122:   // Sort states from URL
+123:   const searchParams = useSearchParams()
+124:   const sortField = (searchParams.get("sortBy") as keyof ContratistaGastoItem) || "fecha"
+125:   const sortDirection = (searchParams.get("sortOrder") as "asc" | "desc") || "desc"
+126: 
+127:   // Visible columns state
+128:   const [visibleColumns, setVisibleColumns] = useState<string[]>([
+129:     "fecha",
+130:     "obraNombre",
+131:     "proveedor",
+132:     "notas",
+133:     "unidad",
+134:     "concepto",
+135:     "subtotal",
+136:     "subtotal8",
+137:     "subtotal16",
+138:     "subtotal0",
+139:     "iva",
+140:     "iva8",
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:03:04Z
+Completed At: 2026-07-24T21:03:04Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 1038
+Total Bytes: 39870
+Showing lines 500 to 600
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+500:     },
+501:     {
+502:       id: "descuento",
+503:       label: "Descto.",
+504:       rightAligned: true,
+505:       render: (row) => (
+506:         <td key="descuento" className="w-[4%] px-2 py-3 text-right font-mono text-[10px] text-muted-foreground truncate">
+507:           {row.descuento ? formatCurrency(row.descuento) : "-"}
+508:         </td>
+509:       ),
+510:     },
+511:     {
+512:       id: "ivaRetenido",
+513:       label: "IVA Ret.",
+514:       rightAligned: true,
+515:       render: (row) => (
+516:         <td key="ivaRetenido" className="w-[4%] px-2 py-3 text-right font-mono text-[10px] text-muted-foreground truncate">
+517:           {row.ivaRetenido ? formatCurrency(row.ivaRetenido) : "-"}
+518:         </td>
+519:       ),
+520:     },
+521:     {
+522:       id: "isrRetenido",
+523:       label: "ISR Ret.",
+524:       rightAligned: true,
+525:       render: (row) => (
+526:         <td key="isrRetenido" className="w-[4%] px-2 py-3 text-right font-mono text-[10px] text-muted-foreground truncate">
+527:           {row.isrRetenido ? formatCurrency(row.isrRetenido) : "-"}
+528:         </td>
+529:       ),
+530:     },
+531:     {
+532:       id: "total",
+533:       sortKey: "total",
+534:       label: "Total",
+535:       rightAligned: true,
+536:       render: (row) => (
+537:         <td key="total" className="w-[6%] px-2 py-3 text-right font-mono text-[10px] font-bold text-foreground truncate">
+538:           {formatCurrency(row.total)}
+539:         </td>
+540:       ),
+541:     },
+542:     {
+543:       id: "capturista",
+544:       label: "Capturista",
+545:       render: (row) => (
+546:         <td key="capturista" className="w-[6%] px-2 py-3 text-[10px] text-muted-foreground truncate" title={row.creadoPorNombre}>
+547:           <span className="text-[10px] font-medium text-foreground/80">
+548:             {row.creadoPorNombre}
+549:           </span>
+550:         </td>
+551:       ),
+552:     }
+553:   ], []);
+554: 
+555:   return (
+556:     <div className="space-y-4 pb-6">
+557:       {/* Top Header Row */}
+558:       <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+559:         <div className="flex flex-col gap-1">
+560:           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
+561:             Registro de Gastos
+562:           </h1>
+563:         </div>
+564:       </div>
+565: 
+566:       {/* Cards Section */}
+567:       {activeCardsData.length > 0 && (
+568:         <div className="flex flex-wrap justify-center gap-4 mt-2">
+569:           {activeCardsData.map(card => (
+570:             <div key={card.id} className="w-[240px]">
+571:               <ObraSummaryCard
+572:                 nombre={card.nombre}
+573:                 totalBruto={card.totalBruto}
+574:                 isActive={true}
+575:                 onClick={() => {
+576:                   setCardToDisable({ id: card.id, nombre: card.nombre, type: card.type as "normal" | "custom" })
+577:                   setIsCardDisableDialogOpen(true)
+578:                 }}
+579:               />
+580:             </div>
+581:           ))}
+582:         </div>
+583:       )}
+584: 
+585:       {/* Action Bar (Search, Filtros, Columnas) */}
+586:       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+587:         <div className="flex flex-1 items-center gap-3">
+588:           <div className="relative w-full max-w-sm">
+589:             <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+590:             <Input
+591:               type="text"
+592:               placeholder="Buscar concepto, obra..."
+593:               value={searchTerm}
+594:               onChange={(e) => setSearchTerm(e.target.value)}
+595:               className="rounded-2xl border-border/40 bg-muted/60 pl-9 text-xs h-10"
+596:             />
+597:           </div>
+598: 
+599:           <Popover>
+600:             <PopoverTrigger asChild>
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:09:07Z
+Completed At: 2026-07-24T21:09:07Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 1035
+Total Bytes: 40060
+Showing lines 120 to 150
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+120:   const [isCardsDialogOpen, setIsCardsDialogOpen] = useState(false)
+121: 
+122:   // Sort states from URL
+123:   const searchParams = useSearchParams()
+124:   const sortField = (searchParams.get("sortBy") as keyof ContratistaGastoItem) || "fecha"
+125:   const sortDirection = (searchParams.get("sortOrder") as "asc" | "desc") || "desc"
+126: 
+127:   // Visible columns state
+128:   const [visibleColumns, setVisibleColumns] = useState<string[]>([
+129:     "fecha",
+130:     "obraNombre",
+131:     "periodo",
+132:     "trabajoRealizado",
+133:     "contratista",
+134:     "total",
+135:     "capturista"
+136:   ])
+137: 
+138:   // Form states
+139:   const [isPending, startTransition] = useTransition()
+140:   const [obraId, setObraId] = useState<string>("")
+141:   const [customObras, setCustomObras] = useState<string[]>([])
+142:   
+143:   // Extract unique proveedores from initialGastos
+144:   const uniqueProveedores = useMemo(() => {
+145:     const provs = initialGastos.map(g => g.proveedor).filter(Boolean)
+146:     return Array.from(new Set(provs)).sort((a, b) => a.localeCompare(b))
+147:   }, [initialGastos])
+148: 
+149:   // Delete state
+150:   const [gastoToDelete, setGastoToDelete] = useState<ContratistaGastoItem | null>(null)
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:09:13Z
+Completed At: 2026-07-24T21:09:14Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 1035
+Total Bytes: 40060
+Showing lines 620 to 680
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+620:                     </Select>
+621:                   </div>
+622:                   <div className="space-y-1.5">
+623:                     <label className="text-xs font-medium text-muted-foreground">Mes</label>
+624:                     <Select value={selectedMonth} onValueChange={(val) => val && setSelectedMonth(val)}>
+625:                       <SelectTrigger className="w-full rounded-xl bg-muted text-xs border-none">
+626:                         <SelectValue placeholder="Seleccionar Mes">
+627:                           {selectedMonth === "all" ? "Todos" : MONTH_NAMES[parseInt(selectedMonth, 10) - 1]}
+628:                         </SelectValue>
+629:                       </SelectTrigger>
+630:                       <SelectContent className="rounded-xl border-border/50 bg-card shadow-2xl">
+631:                         <SelectItem value="all" className="text-xs focus:bg-muted">Todos</SelectItem>
+632:                         {MONTH_NAMES.map((mName, idx) => (
+633:                           <SelectItem key={idx + 1} value={String(idx + 1)} className="text-xs focus:bg-muted">{mName}</SelectItem>
+634:                         ))}
+635:                       </SelectContent>
+636:                     </Select>
+637:                   </div>
+638:                   <div className="space-y-1.5">
+639:                     <label className="text-xs font-medium text-muted-foreground">Obra</label>
+640:                     <Select value={selectedObra} onValueChange={(val) => val && setSelectedObra(val)}>
+641:                       <SelectTrigger className="w-full rounded-xl bg-muted text-xs border-none">
+642:                         <SelectValue placeholder="Seleccionar Obra">
+643:                           {selectedObra === "all" ? "Todas" : obras.find(o => o.id === selectedObra)?.nombre || selectedObra}
+644:                         </SelectValue>
+645:                       </SelectTrigger>
+646:                       <SelectContent className="rounded-xl border-border/50 bg-card shadow-2xl">
+647:                         <SelectItem value="all" className="text-xs focus:bg-muted">Todas las Obras</SelectItem>
+648:                         {obras.map((o) => (
+649:                           <SelectItem key={o.id} value={o.id} className="text-xs focus:bg-muted">{o.nombre}</SelectItem>
+650:                         ))}
+651:                       </SelectContent>
+652:                     </Select>
+653:                   </div>
+654:                 </div>
+655:               </div>
+656:             </PopoverContent>
+657:           </Popover>
+658:         </div>
+659: 
+660:         <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
+661:           <DropdownMenu>
+662:             <DropdownMenuTrigger asChild>
+663:               <Button variant="outline" className="h-10 rounded-2xl bg-card shadow-lg px-4 border-border/40 text-xs font-semibold">
+664:                 Columnas
+665:               </Button>
+666:             </DropdownMenuTrigger>
+667:             <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 bg-card/95 backdrop-blur-xl overflow-y-auto max-h-96">
+668:               <DropdownMenuGroup>
+669:                 {columns.map((column) => (
+670:                   <DropdownMenuCheckboxItem
+671:                     key={column.id}
+672:                     className="rounded-xl focus:bg-muted py-2 text-xs cursor-pointer"
+673:                     checked={visibleColumns.includes(column.id)}
+674:                     onCheckedChange={(checked) => {
+675:                       setVisibleColumns(
+676:                         checked
+677:                           ? [...visibleColumns, column.id]
+678:                           : visibleColumns.filter((id) => id !== column.id)
+679:                       )
+680:                     }}
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:09:41Z
+Completed At: 2026-07-24T21:09:42Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 1035
+Total Bytes: 40060
+Showing lines 650 to 750
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+650:                         ))}
+651:                       </SelectContent>
+652:                     </Select>
+653:                   </div>
+654:                 </div>
+655:               </div>
+656:             </PopoverContent>
+657:           </Popover>
+658:         </div>
+659: 
+660:         <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
+661:           <DropdownMenu>
+662:             <DropdownMenuTrigger asChild>
+663:               <Button variant="outline" className="h-10 rounded-2xl bg-card shadow-lg px-4 border-border/40 text-xs font-semibold">
+664:                 Columnas
+665:               </Button>
+666:             </DropdownMenuTrigger>
+667:             <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 bg-card/95 backdrop-blur-xl overflow-y-auto max-h-96">
+668:               <DropdownMenuGroup>
+669:                 {columns.map((column) => (
+670:                   <DropdownMenuCheckboxItem
+671:                     key={column.id}
+672:                     className="rounded-xl focus:bg-muted py-2 text-xs cursor-pointer"
+673:                     checked={visibleColumns.includes(column.id)}
+674:                     onCheckedChange={(checked) => {
+675:                       setVisibleColumns(
+676:                         checked
+677:                           ? [...visibleColumns, column.id]
+678:                           : visibleColumns.filter((id) => id !== column.id)
+679:                       )
+680:                     }}
+681:                   >
+682:                     {column.label}
+683:                   </DropdownMenuCheckboxItem>
+684:                 ))}
+685:               </DropdownMenuGroup>
+686:             </DropdownMenuContent>
+687:           </DropdownMenu>
+688: 
+689:           <Button 
+690:             variant="outline" 
+691:             className="h-10 rounded-2xl bg-card shadow-lg px-4 border-border/40 text-xs font-semibold"
+692:             onClick={() => setIsCardsDialogOpen(true)}
+693:           >
+694:             Tarjetas
+695:           </Button>
+696:           
+697:           <Button 
+698:             variant="outline"
+699:             className="h-10 rounded-2xl bg-card shadow-lg px-4 border-border/40 text-xs font-semibold"
+700:             onClick={async () => {
+701:               const ExcelJS = (await import("exceljs")).default
+702:               const workbook = new ExcelJS.Workbook()
+703:               const worksheet = workbook.addWorksheet("Gastos")
+704:               
+705:               worksheet.columns = columns
+706:                 .filter(c => visibleColumns.includes(c.id))
+707:                 .map(c => ({
+708:                   header: c.label,
+709:                   key: c.id,
+710:                   width: 15
+711:                 }))
+712:               
+713:               filteredGastos.forEach(g => {
+714:                 const rowData: Record<string, any> = {}
+715:                 columns.filter(c => visibleColumns.includes(c.id)).forEach(c => {
+716:                   if (c.id === "fecha") rowData[c.id] = g.fechaFormatted
+717:                   else if (c.id === "obraNombre") rowData[c.id] = g.obraNombre
+718:                   else if (c.id === "proveedor") rowData[c.id] = g.proveedor
+719:                   else if (c.id === "notas") rowData[c.id] = g.trabajoRealizado
+720:                   else if (c.id === "unidad") rowData[c.id] = g.categoria
+721:                   else if (c.id === "concepto") rowData[c.id] = g.concepto
+722:                   else if (c.id === "subtotal") rowData[c.id] = g.subtotal
+723:                   else if (c.id === "subtotal8") rowData[c.id] = g.subtotal8
+724:                   else if (c.id === "subtotal16") rowData[c.id] = g.subtotal16
+725:                   else if (c.id === "subtotal0") rowData[c.id] = g.subtotal0
+726:                   else if (c.id === "iva") rowData[c.id] = g.porcentajeIVA
+727:                   else if (c.id === "iva8") rowData[c.id] = g.iva8
+728:                   else if (c.id === "iva16") rowData[c.id] = g.iva16
+729:                   else if (c.id === "ieps") rowData[c.id] = g.ieps
+730:                   else if (c.id === "descuento") rowData[c.id] = g.descuento
+731:                   else if (c.id === "ivaRetenido") rowData[c.id] = g.ivaRetenido
+732:                   else if (c.id === "isrRetenido") rowData[c.id] = g.isrRetenido
+733:                   else if (c.id === "total") rowData[c.id] = g.total
+734:                   else if (c.id === "capturista") rowData[c.id] = g.creadoPorNombre
+735:                 })
+736:                 worksheet.addRow(rowData)
+737:               })
+738:               
+739:               const buffer = await workbook.xlsx.writeBuffer()
+740:               const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })
+741:               const url = window.URL.createObjectURL(blob)
+742:               const a = document.createElement("a")
+743:               a.href = url
+744:               a.download = `Gastos_Export_${new Date().toISOString().split("T")[0]}.xlsx`
+745:               a.click()
+746:               window.URL.revokeObjectURL(url)
+747:               sileo.success({ title: "Exportación completada" })
+748:             }}
+749:           >
+750:             Excel
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:10:27Z
+Completed At: 2026-07-24T21:10:27Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 1035
+Total Bytes: 40060
+Showing lines 350 to 450
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+350:       ),
+351:     },
+352:     {
+353:       id: "obraNombre",
+354:       sortKey: "obraNombre",
+355:       label: "Obra",
+356:       render: (row) => (
+357:         <td key="obraNombre" className="w-[6%] px-2 py-3 font-medium text-[10px] text-foreground truncate" title={row.obraNombre}>
+358:           {row.obraNombre}
+359:         </td>
+360:       ),
+361:     },
+362:     {
+363:       id: "proveedor",
+364:       sortKey: "proveedor",
+365:       label: "Proveedor",
+366:       render: (row) => (
+367:         <td key="proveedor" className="w-[10%] px-2 py-3 text-[10px] text-foreground truncate" title={row.proveedor || ""}>
+368:           {row.proveedor || "-"}
+369:         </td>
+370:       ),
+371:     },
+372:     {
+373:       id: "notas",
+374:       label: "Notas",
+375:       render: (row) => (
+376:         <td key="notas" className="w-[7%] px-2 py-3 text-[10px] text-muted-foreground truncate" title={row.notaCapturista || ""}>
+377:           {row.notaCapturista || "-"}
+378:         </td>
+379:       ),
+380:     },
+381:     {
+382:       id: "unidad",
+383:       label: "Unidad",
+384:       render: (row) => (
+385:         <td key="unidad" className="w-[3%] px-2 py-3 text-[10px] text-muted-foreground truncate" title={row.categoria || ""}>
+386:           {row.categoria || "-"}
+387:         </td>
+388:       ),
+389:     },
+390: 
+391:     {
+392:       id: "concepto",
+393:       sortKey: "concepto",
+394:       label: "Concepto",
+395:       render: (row) => (
+396:         <td
+397:           key="concepto"
+398:           className="w-[12%] px-2 py-3 text-[10px] text-foreground truncate cursor-pointer hover:bg-primary/10 transition-colors rounded-md"
+399:           title={row.concepto}
+400:           onClick={() => {
+401:             navigator.clipboard.writeText(row.concepto)
+402:             sileo.success({ title: "Concepto copiado" })
+403:           }}
+404:         >
+405:           {row.concepto}
+406:         </td>
+407:       ),
+408:     },
+409:     {
+410:       id: "subtotal",
+411:       sortKey: "subtotal",
+412:       label: "Subtotal",
+413:       rightAligned: true,
+414:       render: (row) => (
+415:         <td key="subtotal" className="w-[6%] px-2 py-3 text-right font-mono text-[10px] text-foreground truncate">
+416:           {formatCurrency(row.subtotal)}
+417:         </td>
+418:       ),
+419:     },
+420:     {
+421:       id: "subtotal8",
+422:       label: "Sub. 8%",
+423:       rightAligned: true,
+424:       render: (row) => (
+425:         <td key="subtotal8" className="w-[5%] px-2 py-3 text-right font-mono text-[10px] text-muted-foreground truncate">
+426:           {row.subtotal8 ? formatCurrency(row.subtotal8) : "-"}
+427:         </td>
+428:       ),
+429:     },
+430:     {
+431:       id: "subtotal16",
+432:       label: "Sub. 16%",
+433:       rightAligned: true,
+434:       render: (row) => (
+435:         <td key="subtotal16" className="w-[5%] px-2 py-3 text-right font-mono text-[10px] text-muted-foreground truncate">
+436:           {row.subtotal16 ? formatCurrency(row.subtotal16) : "-"}
+437:         </td>
+438:       ),
+439:     },
+440:     {
+441:       id: "subtotal0",
+442:       label: "Sub. 0%",
+443:       rightAligned: true,
+444:       render: (row) => (
+445:         <td key="subtotal0" className="w-[5%] px-2 py-3 text-right font-mono text-[10px] text-muted-foreground truncate">
+446:           {row.subtotal0 ? formatCurrency(row.subtotal0) : "-"}
+447:         </td>
+448:       ),
+449:     },
+450:     {
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:12:07Z
+Completed At: 2026-07-24T21:12:07Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 877
+Total Bytes: 34821
+Showing lines 200 to 250
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+200:       return
+201:     }
+202:     if (subNum <= 0) {
+203:       sileo.error({ title: "El subtotal debe ser mayor a 0" })
+204:       return
+205:     }
+206: 
+207:     startTransition(async () => {
+208:       const res = await createContratistaGastoFromModule({
+209:         obraId,
+210:         fechaStr,
+211:         concepto,
+212:         proveedor: proveedor || "N/A",
+213:         categoria,
+214:         subtotal: subNum,
+215:         porcentajeIVA,
+216:         ieps: parseCurrency(ieps) || undefined,
+217:         descuento: parseCurrency(descuento) || undefined,
+218:         ivaRetenido: parseCurrency(ivaRetenido) || undefined,
+219:         isrRetenido: parseCurrency(isrRetenido) || undefined,
+220:         notaCapturista,
+221:       })
+222: 
+223:       if (res.success) {
+224:         sileo.success({ title: "Gasto registrado exitosamente" })
+225:         setConcepto("")
+226:         setProveedor("")
+227:         setCategoria("")
+228:         setSubtotal("")
+229:         setIeps("")
+230:         setDescuento("")
+231:         setIvaRetenido("")
+232:         setIsrRetenido("")
+233:         setNotaCapturista("")
+234:       } else {
+235:         sileo.error({ title: res.error || "Error al registrar gasto" })
+236:       }
+237:     })
+238:   }
+239: 
+240:   // Filtered expenses
+241:   const filteredGastos = useMemo(() => {
+242:     return initialGastos.filter((g) => {
+243:       if (selectedYear !== "all" && g.year !== parseInt(selectedYear, 10)) return false
+244:       if (selectedMonth !== "all" && g.month !== parseInt(selectedMonth, 10)) return false
+245:       if (selectedObra !== "all" && g.obraId !== selectedObra) return false
+246:       if (searchTerm.trim()) {
+247:         const query = searchTerm.toLowerCase()
+248:         const matchConcepto = g.concepto.toLowerCase().includes(query)
+249:         const matchProveedor = (g.proveedor || "").toLowerCase().includes(query)
+250:         const matchObra = g.obraNombre.toLowerCase().includes(query)
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:15:47Z
+Completed At: 2026-07-24T21:15:47Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 877
+Total Bytes: 34833
+Showing lines 120 to 160
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+120:   ])
+121: 
+122:   // Form states
+123:   const [isPending, startTransition] = useTransition()
+124:   const [obraId, setObraId] = useState<string>("")
+125:   const [customObras, setCustomObras] = useState<string[]>([])
+126:   
+127:   const [fechaStr, setFechaStr] = useState("")
+128:   const [obraNombre, setObraNombre] = useState("")
+129:   const [periodo, setPeriodo] = useState("")
+130:   const [trabajoRealizado, setTrabajoRealizado] = useState("")
+131:   const [contratista, setContratista] = useState("")
+132:   const [total, setTotal] = useState("")
+133:   
+134:   // Extract unique proveedores from initialGastos
+135:   const uniqueProveedores = useMemo(() => {
+136:     const provs = initialGastos.map(g => g.contratista).filter(Boolean)
+137:     return Array.from(new Set(provs)).sort((a, b) => a.localeCompare(b))
+138:   }, [initialGastos])
+139: 
+140:   // Delete state
+141: 
+142:   const [gastoToDelete, setGastoToDelete] = useState<ContratistaGastoItem | null>(null)
+143:   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+144:   
+145:   // Card Disable State
+146:   const [cardToDisable, setCardToDisable] = useState<{ id: string, nombre: string, type: "normal" | "custom" } | null>(null)
+147:   const [isCardDisableDialogOpen, setIsCardDisableDialogOpen] = useState(false)
+148: 
+149:   const [fechaStr, setFechaStr] = useState<string>(
+150:     new Date().toISOString().split("T")[0]
+151:   )
+152:   const [concepto, setConcepto] = useState<string>("")
+153:   const [proveedor, setProveedor] = useState<string>("")
+154:   const [categoria, setCategoria] = useState<string>("")
+155:   const [subtotal, setSubtotal] = useState<string>("")
+156:   const [porcentajeIVA, setPorcentajeIVA] = useState<number>(16)
+157:   const [ieps, setIeps] = useState<string>("")
+158:   const [descuento, setDescuento] = useState<string>("")
+159:   const [ivaRetenido, setIvaRetenido] = useState<string>("")
+160:   const [isrRetenido, setIsrRetenido] = useState<string>("")
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:19:06Z
+Completed At: 2026-07-24T21:19:06Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 640
+Total Bytes: 24820
+Showing lines 620 to 640
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+620:         isFiltered={filteredGastos.length !== initialGastos.length}
+621:         emptyMessage="No se encontraron gastos para el periodo u obra seleccionados."
+622:         tableLayout="fixed"
+623:         onRowClick={(row) => {
+624:           setGastoToDelete(row)
+625:           setIsDeleteDialogOpen(true)
+626:         }}
+627:       />
+628: 
+629:       <CardsCrudDialog
+630:         open={isCardsDialogOpen}
+631:         onOpenChange={setIsCardsDialogOpen}
+632:         obras={obras}
+633:         allCardsData={[...allObrasCardsData, ...customCardsData]}
+634:         activeCards={cards}
+635:         onCardsChange={setCards}
+636:       />
+637:     </div>
+638:   )
+639: }
+640: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:19:26Z
+Completed At: 2026-07-24T21:19:26Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 640
+Total Bytes: 24820
+Showing lines 160 to 200
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+160:       setIsDeleteDialogOpen(false)
+161:     })
+162:   }
+163: 
+164:   const parseCurrency = (val: string) => parseFloat(val.replace(/,/g, "")) || 0
+165:   const subNum = parseCurrency(subtotal)
+166: 
+167:   
+168:       if (!fechaStr) {
+169:       sileo.error({ title: "Selecciona la fecha del gasto" })
+170:       return
+171:     }
+172: 
+173:     if (!obras.some(o => o.nombre === obraId.trim()) && !customObras.includes(obraId.trim())) {
+174:       setCustomObras(prev => [...prev, obraId.trim()]);
+175:     }
+176:     if (!concepto.trim()) {
+177:       sileo.error({ title: "Ingresa el concepto del gasto" })
+178:       return
+179:     }
+180:     if (subNum <= 0) {
+181:       sileo.error({ title: "El subtotal debe ser mayor a 0" })
+182:       return
+183:     }
+184: 
+185:     startTransition(async () => {
+186:       const res = await createContratistaGastoFromModule({
+187:         fechaStr,
+188:         obraNombre,
+189:         periodo,
+190:         trabajoRealizado,
+191:         contratista,
+192:         total: parseFloat(total) || 0
+193:       })
+194: 
+195:       if (res.success) {
+196:         sileo.success({ title: "Gasto registrado exitosamente" })
+197:         
+198:         setNotaCapturista("")
+199:       } else {
+200:         sileo.error({ title: res.error || "Error al registrar gasto" })
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:19:33Z
+Completed At: 2026-07-24T21:19:33Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 640
+Total Bytes: 24820
+Showing lines 190 to 250
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+190:         trabajoRealizado,
+191:         contratista,
+192:         total: parseFloat(total) || 0
+193:       })
+194: 
+195:       if (res.success) {
+196:         sileo.success({ title: "Gasto registrado exitosamente" })
+197:         
+198:         setNotaCapturista("")
+199:       } else {
+200:         sileo.error({ title: res.error || "Error al registrar gasto" })
+201:       }
+202:     })
+203:   }
+204: 
+205:   // Filtered expenses
+206:   const filteredGastos = useMemo(() => {
+207:     return initialGastos.filter((g) => {
+208:       if (selectedYear !== "all" && g.year !== parseInt(selectedYear, 10)) return false
+209:       // Mes no aplica porque no tenemos month en el schema, iteramos string if needed
+210:       // 
+211:       if (selectedObra !== "all" && g.obraNombre !== selectedObra && g.obraNombre !== (obras.find(o=>o.id===selectedObra)?.nombre)) return false
+212:       if (searchTerm.trim()) {
+213:         const query = searchTerm.toLowerCase()
+214:         const matchObra = g.obraNombre.toLowerCase().includes(query)
+215:         const matchContratista = g.contratista.toLowerCase().includes(query)
+216:         const matchTrabajo = (g.trabajoRealizado || "").toLowerCase().includes(query)
+217:         const matchPeriodo = (g.periodo || "").toLowerCase().includes(query)
+218:         if (!matchObra && !matchContratista && !matchTrabajo && !matchPeriodo) return false
+219:       }
+220:       return true
+221:     })
+222:   }, [initialGastos, selectedYear, selectedMonth, selectedObra, searchTerm, obras])
+223: 
+224:   // Sorted expenses
+225:   const sortedGastos = useMemo(() => {
+226:     return [...filteredGastos].sort((a, b) => {
+227:       let valA: any = a[sortField]
+228:       let valB: any = b[sortField]
+229: 
+230:       if (typeof valA === "string") {
+231:         valA = valA.toLowerCase()
+232:         valB = (valB || "").toLowerCase()
+233:       }
+234: 
+235:       if (valA < valB) return sortDirection === "asc" ? -1 : 1
+236:       if (valA > valB) return sortDirection === "asc" ? 1 : -1
+237:       
+238:       // Secondary sort by fecha if primary fields are equal (or if we are grouping by proveedor)
+239:       if (sortField !== "fecha") {
+240:         if (a.fecha > b.fecha) return -1
+241:         if (a.fecha < b.fecha) return 1
+242:       }
+243:       return 0
+244:     })
+245:   }, [filteredGastos, sortField, sortDirection])
+246: 
+247:   // Calculate historical totals for all NORMAL obras to pass to modal
+248:   const allObrasCardsData = useMemo(() => {
+249:     return obras
+250:       .filter(obra => !cards.some(c => c.id === obra.id && (c as any).type === "deleted_normal"))
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:25:00Z
+Completed At: 2026-07-24T21:25:00Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 580
+Total Bytes: 22398
+Showing lines 385 to 405
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+385:               </DialogTrigger>
+386:               <DialogContent className="max-w-md rounded-3xl p-6 border-none bg-card/95 backdrop-blur-2xl shadow-2xl">
+387:                 <DialogHeader>
+388:                   <DialogTitle>Registrar Pago a Contratista</DialogTitle>
+389:                 </DialogHeader>
+390:                 <CaptureForm />
+391:               </DialogContent>
+392:             </Dialog>
+393:           ) : (
+394:             
+395:           )}
+396:         </div>
+397:       </div>
+398: 
+399:       {activeCardsData.length > 0 && (
+400:         <div className="flex w-full gap-4 overflow-x-auto pb-4 snap-x snap-mandatory pt-2 scrollbar-hide" style={{ WebkitOverflowScrolling: "touch" }}>
+401:           {activeCardsData.map(card => (
+402:             <div key={card.id} className="snap-start shrink-0 first:pl-1">
+403:               <div className="w-[240px]">
+404:                 <ObraSummaryCard
+405:                   nombreObra={card.nombre}
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:34:41Z
+Completed At: 2026-07-24T21:34:42Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 891
+Total Bytes: 35058
+Showing lines 350 to 450
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+350:     },
+351:     {
+352:       id: "obraNombre",
+353:       sortKey: "obraNombre",
+354:       label: "Obra",
+355:       render: (row) => (
+356:         <td key="obraNombre" className="w-[10%] px-2 py-3 text-[10px] font-medium truncate">
+357:           {row.obraNombre}
+358:         </td>
+359:       ),
+360:     },
+361:     {
+362:       id: "periodo",
+363:       sortKey: "periodo",
+364:       label: "Periodo",
+365:       render: (row) => (
+366:         <td key="periodo" className="w-[10%] px-2 py-3 text-[10px] text-muted-foreground truncate">
+367:           {row.periodo}
+368:         </td>
+369:       ),
+370:     },
+371:     {
+372:       id: "trabajoRealizado",
+373:       sortKey: "trabajoRealizado",
+374:       label: "Trabajo Realizado",
+375:       render: (row) => (
+376:         <td key="trabajoRealizado" className="w-[30%] px-2 py-3 text-[10px] text-muted-foreground truncate max-w-[200px]" title={row.trabajoRealizado}>
+377:           {row.trabajoRealizado}
+378:         </td>
+379:       ),
+380:     },
+381:     {
+382:       id: "contratista",
+383:       sortKey: "contratista",
+384:       label: "Contratista",
+385:       render: (row) => (
+386:         <td key="contratista" className="w-[15%] px-2 py-3 text-[10px] font-medium truncate">
+387:           {row.contratista}
+388:         </td>
+389:       ),
+390:     },
+391:     {
+392:       id: "total",
+393:       sortKey: "total",
+394:       label: "Total",
+395:       rightAligned: true,
+396:       render: (row) => (
+397:         <td key="total" className="w-[10%] px-2 py-3 text-right font-mono text-[10px] font-bold text-foreground truncate">
+398:           {formatCurrency(row.total)}
+399:         </td>
+400:       ),
+401:     },
+402:     {
+403:       id: "capturista",
+404:       label: "Capturista",
+405:       render: (row) => (
+406:         <td key="capturista" className="w-[10%] px-2 py-3 text-[10px] text-muted-foreground truncate" title={row.creadoPorNombre}>
+407:           {row.creadoPorNombre}
+408:         </td>
+409:       ),
+410:     }
+411:   ], []);
+412: 
+413:   return (
+414:     <div className="space-y-4 pb-6">
+415:       {/* Top Header Row */}
+416:       <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+417:         <div className="flex flex-col gap-1">
+418:           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
+419:             Pagos a Contratistas
+420:           </h1>
+421:         </div>
+422:         <div className="flex items-center gap-3">
+423:           <a href="/admin/gastos">
+424:             <Button variant="secondary" className="rounded-xl px-6 shadow-sm border border-border/50 bg-muted/30">
+425:               Gastos Generales
+426:             </Button>
+427:           </a>
+428:         </div>
+429:       </div>
+430: 
+431:       {/* Cards Section */}
+432:       {activeCardsData.length > 0 && (
+433:         <div className="flex flex-wrap justify-center gap-4 mt-2">
+434:           {activeCardsData.map(card => (
+435:             <div key={card.id} className="w-[240px]">
+436:               <ObraSummaryCard
+437:                 nombre={card.nombre}
+438:                 totalBruto={card.totalBruto}
+439:                 isActive={true}
+440:                 onClick={() => {
+441:                   setCardToDisable({ id: card.id, nombre: card.nombre, type: card.type as "normal" | "custom" })
+442:                   setIsCardDisableDialogOpen(true)
+443:                 }}
+444:               />
+445:             </div>
+446:           ))}
+447:         </div>
+448:       )}
+449: 
+450:       {/* Action Bar (Search, Filtros, Columnas) */}
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:35:40Z
+Completed At: 2026-07-24T21:35:40Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 891
+Total Bytes: 35043
+Showing lines 750 to 850
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+750:           {/* ISR Ret. */}
+751:           <div className="space-y-1.5 w-[120px] shrink-0">
+752:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">ISR Ret. ($)</Label>
+753:             <div className="relative">
+754:               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium pointer-events-none">$</span>
+755:               <Input
+756:                 type="text"
+757:                 placeholder="ISR"
+758:                 value={isrRetenido}
+759:                 onChange={(e) => setIsrRetenido(formatCurrencyInput(e.target.value))}
+760:                 className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full pl-6"
+761:               />
+762:             </div>
+763:           </div>
+764: 
+765:           {/* Unidad (Categoria) */}
+766:           <div className="space-y-1.5 w-[120px] shrink-0">
+767:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Unidad</Label>
+768:             <Input
+769:               type="text"
+770:               placeholder="Pza, Kg..."
+771:               value={categoria}
+772:               onChange={(e) => setCategoria(e.target.value)}
+773:               className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full"
+774:             />
+775:           </div>
+776: 
+777:           {/* Proveedor */}
+778:           <ComboboxInput
+779:             label="Proveedor"
+780:             value={proveedor}
+781:             onChange={setProveedor}
+782:             options={uniqueProveedores}
+783:             placeholder="Home Depot, Cemex..."
+784:             className="flex-[1_1_200px]"
+785:           />
+786: 
+787:           {/* Concepto */}
+788:           <div className="space-y-1.5 flex-[1_1_250px]">
+789:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Concepto</Label>
+790:             <Input
+791:               type="text"
+792:               placeholder="Gasolina, Varilla..."
+793:               value={concepto}
+794:               onChange={(e) => setConcepto(e.target.value)}
+795:               className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full"
+796:               required
+797:             />
+798:           </div>
+799: 
+800:           <Button
+801:             type="submit"
+802:             form="registro-gasto-form"
+803:             disabled={isPending}
+804:             size="icon"
+805:             className="h-[36px] w-[36px] rounded-2xl bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95 shrink-0"
+806:             title="Agregar Gasto"
+807:           >
+808:             {isPending ? (
+809:               <Loader2 className="h-4 w-4 animate-spin" />
+810:             ) : (
+811:               <Plus className="h-5 w-5" />
+812:             )}
+813:           </Button>
+814:         </form>
+815:       </div>
+816: 
+817:       <ConfirmDialog
+818:         open={isDeleteDialogOpen}
+819:         onOpenChange={setIsDeleteDialogOpen}
+820:         title="Eliminar Gasto"
+821:         description={`¿Estás seguro de que deseas eliminar el gasto "${gastoToDelete?.concepto}" de ${gastoToDelete?.obraNombre}? \n\nEsta acción lo mandará a la papelera.`}
+822:         confirmText="Eliminar"
+823:         cancelText="Cancelar"
+824:         variant="destructive"
+825:         onConfirm={handleDelete}
+826:       />
+827: 
+828:       <ConfirmDialog
+829:         open={isCardDisableDialogOpen}
+830:         onOpenChange={setIsCardDisableDialogOpen}
+831:         title="Apagar Tarjeta"
+832:         description={`¿Quieres apagar la tarjeta "${cardToDisable?.nombre}" y ocultarla de la pantalla principal?\n\nPuedes volver a encenderla en cualquier momento desde el menú de Tarjetas.`}
+833:         confirmText="Apagar"
+834:         cancelText="Cancelar"
+835:         variant="destructive"
+836:         onConfirm={() => {
+837:           if (!cardToDisable) return
+838:           startTransition(async () => {
+839:             const exists = cards.find(c => c.id === cardToDisable.id && c.type === cardToDisable.type)
+840:             let updated: any[]
+841:             if (exists) {
+842:               updated = cards.map(c => c === exists ? { ...c, isEnabled: false } : c)
+843:             } else {
+844:               updated = [...cards, { id: cardToDisable.id, type: "normal", obraId: cardToDisable.id, isEnabled: false }]
+845:             }
+846:             
+847:             // Optimistic update
+848:             setCards(updated)
+849:             const res = await saveContratistaCards(updated)
+850:             if (!res.success) {
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:35:45Z
+Completed At: 2026-07-24T21:35:45Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 891
+Total Bytes: 35043
+Showing lines 850 to 891
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+850:             if (!res.success) {
+851:               sileo.error({ title: "Error al apagar tarjeta" })
+852:               setCards(cards) // Revert
+853:             } else {
+854:               sileo.success({ title: "Tarjeta apagada" })
+855:             }
+856:           })
+857:         }}
+858:       />
+859: 
+860: 
+861: 
+862:       <DataTable
+863:         data={sortedGastos}
+864:         columns={columns}
+865:         visibleColumns={visibleColumns}
+866:         keyExtractor={(row) => row.id}
+867:         maxHeight="calc(100vh - 280px)"
+868:         batchSize={100}
+869:         totalFilteredCount={filteredGastos.length}
+870:         totalCount={initialGastos.length}
+871:         isFiltered={filteredGastos.length !== initialGastos.length}
+872:         emptyMessage="No se encontraron gastos para el periodo u obra seleccionados."
+873:         tableLayout="fixed"
+874:         onRowClick={(row) => {
+875:           setGastoToDelete(row)
+876:           setIsDeleteDialogOpen(true)
+877:         }}
+878:       />
+879: 
+880:       <CardsCrudDialog
+881:         open={isCardsDialogOpen}
+882:         onOpenChange={setIsCardsDialogOpen}
+883:         obras={obras}
+884:         allCardsData={[...allObrasCardsData, ...customCardsData]}
+885:         activeCards={cards}
+886:         onCardsChange={setCards}
+887:       />
+888:     </div>
+889:   )
+890: }
+891: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:40:11Z
+Completed At: 2026-07-24T21:40:11Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 898
+Total Bytes: 35177
+Showing lines 720 to 850
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+720:                 onChange={(e) => setIeps(formatCurrencyInput(e.target.value))}
+721:                 className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full pl-6"
+722:               />
+723:             </div>
+724:           </div>
+725: 
+726:           {/* Descto */}
+727:           <div className="space-y-1.5 w-[120px] shrink-0">
+728:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Descto ($)</Label>
+729:             <div className="relative">
+730:               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium pointer-events-none">$</span>
+731:               <Input
+732:                 type="text"
+733:                 placeholder="0.00"
+734:                 value={descuento}
+735:                 onChange={(e) => setDescuento(formatCurrencyInput(e.target.value))}
+736:                 className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full pl-6"
+737:               />
+738:             </div>
+739:           </div>
+740: 
+741:           {/* Retención */}
+742:           <div className="space-y-1.5 w-[120px] shrink-0">
+743:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Retención ($)</Label>
+744:             <div className="relative">
+745:               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium pointer-events-none">$</span>
+746:               <Input
+747:                 type="text"
+748:                 placeholder="IVA"
+749:                 title="IVA Retenido"
+750:                 value={ivaRetenido}
+751:                 onChange={(e) => setIvaRetenido(formatCurrencyInput(e.target.value))}
+752:                 className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full pl-6"
+753:               />
+754:             </div>
+755:           </div>
+756: 
+757:           {/* ISR Ret. */}
+758:           <div className="space-y-1.5 w-[120px] shrink-0">
+759:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">ISR Ret. ($)</Label>
+760:             <div className="relative">
+761:               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium pointer-events-none">$</span>
+762:               <Input
+763:                 type="text"
+764:                 placeholder="ISR"
+765:                 value={isrRetenido}
+766:                 onChange={(e) => setIsrRetenido(formatCurrencyInput(e.target.value))}
+767:                 className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full pl-6"
+768:               />
+769:             </div>
+770:           </div>
+771: 
+772:           {/* Unidad (Categoria) */}
+773:           <div className="space-y-1.5 w-[120px] shrink-0">
+774:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Unidad</Label>
+775:             <Input
+776:               type="text"
+777:               placeholder="Pza, Kg..."
+778:               value={categoria}
+779:               onChange={(e) => setCategoria(e.target.value)}
+780:               className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full"
+781:             />
+782:           </div>
+783: 
+784:           {/* Proveedor */}
+785:           <ComboboxInput
+786:             label="Proveedor"
+787:             value={proveedor}
+788:             onChange={setProveedor}
+789:             options={uniqueProveedores}
+790:             placeholder="Home Depot, Cemex..."
+791:             className="flex-[1_1_200px]"
+792:           />
+793: 
+794:           {/* Concepto */}
+795:           <div className="space-y-1.5 flex-[1_1_250px]">
+796:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Concepto</Label>
+797:             <Input
+798:               type="text"
+799:               placeholder="Gasolina, Varilla..."
+800:               value={concepto}
+801:               onChange={(e) => setConcepto(e.target.value)}
+802:               className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full"
+803:               required
+804:             />
+805:           </div>
+806: 
+807:           <Button
+808:             type="submit"
+809:             form="registro-gasto-form"
+810:             disabled={isPending}
+811:             size="icon"
+812:             className="h-[36px] w-[36px] rounded-2xl bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95 shrink-0"
+813:             title="Agregar Gasto"
+814:           >
+815:             {isPending ? (
+816:               <Loader2 className="h-4 w-4 animate-spin" />
+817:             ) : (
+818:               <Plus className="h-5 w-5" />
+819:             )}
+820:           </Button>
+821:         </form>
+822:       </div>
+823: 
+824:       <ConfirmDialog
+825:         open={isDeleteDialogOpen}
+826:         onOpenChange={setIsDeleteDialogOpen}
+827:         title="Eliminar Gasto"
+828:         description={`¿Estás seguro de que deseas eliminar el gasto "${gastoToDelete?.concepto}" de ${gastoToDelete?.obraNombre}? \n\nEsta acción lo mandará a la papelera.`}
+829:         confirmText="Eliminar"
+830:         cancelText="Cancelar"
+831:         variant="destructive"
+832:         onConfirm={handleDelete}
+833:       />
+834: 
+835:       <ConfirmDialog
+836:         open={isCardDisableDialogOpen}
+837:         onOpenChange={setIsCardDisableDialogOpen}
+838:         title="Apagar Tarjeta"
+839:         description={`¿Quieres apagar la tarjeta "${cardToDisable?.nombre}" y ocultarla de la pantalla principal?\n\nPuedes volver a encenderla en cualquier momento desde el menú de Tarjetas.`}
+840:         confirmText="Apagar"
+841:         cancelText="Cancelar"
+842:         variant="destructive"
+843:         onConfirm={() => {
+844:           if (!cardToDisable) return
+845:           startTransition(async () => {
+846:             const exists = cards.find(c => c.id === cardToDisable.id && c.type === cardToDisable.type)
+847:             let updated: any[]
+848:             if (exists) {
+849:               updated = cards.map(c => c === exists ? { ...c, isEnabled: false } : c)
+850:             } else {
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:40:17Z
+Completed At: 2026-07-24T21:40:17Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 898
+Total Bytes: 35177
+Showing lines 550 to 720
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+550:                       setVisibleColumns(
+551:                         checked
+552:                           ? [...visibleColumns, column.id]
+553:                           : visibleColumns.filter((id) => id !== column.id)
+554:                       )
+555:                     }}
+556:                   >
+557:                     {column.label}
+558:                   </DropdownMenuCheckboxItem>
+559:                 ))}
+560:               </DropdownMenuGroup>
+561:             </DropdownMenuContent>
+562:           </DropdownMenu>
+563: 
+564:           <Button 
+565:             variant="outline" 
+566:             className="h-10 rounded-2xl bg-card shadow-lg px-4 border-border/40 text-xs font-semibold"
+567:             onClick={() => setIsCardsDialogOpen(true)}
+568:           >
+569:             Tarjetas
+570:           </Button>
+571:           
+572:           <Button 
+573:             variant="outline"
+574:             className="h-10 rounded-2xl bg-card shadow-lg px-4 border-border/40 text-xs font-semibold"
+575:             onClick={async () => {
+576:               const ExcelJS = (await import("exceljs")).default
+577:               const workbook = new ExcelJS.Workbook()
+578:               const worksheet = workbook.addWorksheet("Gastos")
+579:               
+580:               worksheet.columns = columns
+581:                 .filter(c => visibleColumns.includes(c.id))
+582:                 .map(c => ({
+583:                   header: c.label,
+584:                   key: c.id,
+585:                   width: 15
+586:                 }))
+587:               
+588:               filteredGastos.forEach(g => {
+589:                 const rowData: Record<string, any> = {}
+590:                 columns.filter(c => visibleColumns.includes(c.id)).forEach(c => {
+591:                   if (c.id === "fecha") rowData[c.id] = g.fechaFormatted || g.fechaStr
+592:                   else if (c.id === "obraNombre") rowData[c.id] = g.obraNombre
+593:                   else if (c.id === "periodo") rowData[c.id] = g.periodo
+594:                   else if (c.id === "trabajoRealizado") rowData[c.id] = g.trabajoRealizado
+595:                   else if (c.id === "contratista") rowData[c.id] = g.contratista
+596:                   else if (c.id === "total") rowData[c.id] = g.total
+597:                   else if (c.id === "capturista") rowData[c.id] = g.creadoPorNombre
+598:                 })
+599:                 worksheet.addRow(rowData)
+600:               })
+601:               
+602:               const buffer = await workbook.xlsx.writeBuffer()
+603:               const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })
+604:               const url = window.URL.createObjectURL(blob)
+605:               const a = document.createElement("a")
+606:               a.href = url
+607:               a.download = `Gastos_Export_${new Date().toISOString().split("T")[0]}.xlsx`
+608:               a.click()
+609:               window.URL.revokeObjectURL(url)
+610:               sileo.success({ title: "Exportación completada" })
+611:             }}
+612:           >
+613:             Excel
+614:           </Button>
+615:         </div>
+616:       </div>
+617: 
+618: 
+619:       {/* Inline Create Form */}
+620:       <div className="rounded-3xl bg-card/70 p-4 shadow-lg backdrop-blur-xl">
+621:         <form id="registro-gasto-form" onSubmit={handleSubmit} className="flex flex-wrap gap-4 items-end">
+622:           
+623:           {/* Obra */}
+624:           <ComboboxInput
+625:             label="Obra"
+626:             value={obraId}
+627:             onChange={setObraId}
+628:             options={[...obras.map(o => o.nombre), ...customObras]}
+629:             className="flex-[1_1_200px]"
+630:             required
+631:           />
+632: 
+633:           {/* Fecha */}
+634:           <div className="space-y-1.5 flex flex-col w-[260px] shrink-0">
+635:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Fecha</Label>
+636:             <Popover>
+637:               <PopoverTrigger asChild>
+638:                 <Button
+639:                   variant="ghost"
+640:                   className={cn(
+641:                     "w-full justify-start text-left font-normal rounded-2xl border-none bg-muted/60 px-3 py-2 text-xs text-foreground hover:bg-muted focus:ring-1 focus:ring-ring h-[36px]",
+642:                     !fechaStr && "text-muted-foreground"
+643:                   )}
+644:                 >
+645:                   <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+646:                   {fechaStr ? format(new Date(fechaStr + "T12:00:00"), "dd/MM/yyyy", { locale: es }) : <span>Selecciona fecha</span>}
+647:                 </Button>
+648:               </PopoverTrigger>
+649:               <PopoverContent className="w-auto p-0 rounded-2xl border-border/50 bg-card shadow-2xl backdrop-blur-xl" align="start">
+650:                 <Calendar
+651:                   mode="single"
+652:                   selected={fechaStr ? new Date(fechaStr + "T12:00:00") : undefined}
+653:                   onSelect={(date) => {
+654:                     if (date) setFechaStr(date.toISOString().split("T")[0])
+655:                   }}
+656:                   className="p-3"
+657:                 />
+658:               </PopoverContent>
+659:             </Popover>
+660:           </div>
+661: 
+662:           {/* Notas */}
+663:           <div className="space-y-1.5 flex-[2_2_300px]">
+664:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Notas</Label>
+665:             <Input
+666:               type="text"
+667:               placeholder="Observaciones..."
+668:               value={notaCapturista}
+669:               onChange={(e) => setNotaCapturista(e.target.value)}
+670:               className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full"
+671:             />
+672:           </div>
+673: 
+674:           {/* Subtotal */}
+675:           <div className="space-y-1.5 w-[140px] shrink-0">
+676:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Subtotal ($)</Label>
+677:             <div className="relative">
+678:               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium pointer-events-none">$</span>
+679:               <Input
+680:                 type="text"
+681:                 placeholder="0.00"
+682:                 value={subtotal}
+683:                 onChange={(e) => setSubtotal(formatCurrencyInput(e.target.value))}
+684:                 className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full pl-6"
+685:                 required
+686:               />
+687:             </div>
+688:           </div>
+689: 
+690:           {/* Tasa IVA */}
+691:           <div className="space-y-1.5 w-[160px] shrink-0">
+692:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Tasa IVA</Label>
+693:             <div className="flex rounded-2xl bg-muted/60 p-1 h-[36px]">
+694:               {[0, 8, 16].map((pct) => (
+695:                 <button
+696:                   key={pct}
+697:                   type="button"
+698:                   onClick={() => setPorcentajeIVA(pct)}
+699:                   className={`flex-1 rounded-xl py-1 text-xs font-semibold transition-all ${
+700:                     porcentajeIVA === pct
+701:                       ? "bg-primary text-primary-foreground shadow-sm"
+702:                       : "text-muted-foreground hover:text-foreground"
+703:                   }`}
+704:                 >
+705:                   {pct}%
+706:                 </button>
+707:               ))}
+708:             </div>
+709:           </div>
+710: 
+711:           {/* IEPS */}
+712:           <div className="space-y-1.5 w-[120px] shrink-0">
+713:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">IEPS ($)</Label>
+714:             <div className="relative">
+715:               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium pointer-events-none">$</span>
+716:               <Input
+717:                 type="text"
+718:                 placeholder="0.00"
+719:                 value={ieps}
+720:                 onChange={(e) => setIeps(formatCurrencyInput(e.target.value))}
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:40:24Z
+Completed At: 2026-07-24T21:40:24Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 898
+Total Bytes: 35177
+Showing lines 140 to 250
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+140:   const [customObras, setCustomObras] = useState<string[]>([])
+141:   
+142:   // Extract unique proveedores from initialGastos
+143:   const uniqueProveedores = useMemo(() => {
+144:     const provs = initialGastos.map(g => g.proveedor).filter(Boolean)
+145:     return Array.from(new Set(provs)).sort((a, b) => a.localeCompare(b))
+146:   }, [initialGastos])
+147: 
+148:   // Delete state
+149:   const [gastoToDelete, setGastoToDelete] = useState<ContratistaGastoItem | null>(null)
+150:   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+151:   
+152:   // Card Disable State
+153:   const [cardToDisable, setCardToDisable] = useState<{ id: string, nombre: string, type: "normal" | "custom" } | null>(null)
+154:   const [isCardDisableDialogOpen, setIsCardDisableDialogOpen] = useState(false)
+155: 
+156:   const [fechaStr, setFechaStr] = useState<string>(
+157:     new Date().toISOString().split("T")[0]
+158:   )
+159:   const [concepto, setConcepto] = useState<string>("")
+160:   const [proveedor, setProveedor] = useState<string>("")
+161:   const [categoria, setCategoria] = useState<string>("")
+162:   const [subtotal, setSubtotal] = useState<string>("")
+163:   const [porcentajeIVA, setPorcentajeIVA] = useState<number>(16)
+164:   const [ieps, setIeps] = useState<string>("")
+165:   const [descuento, setDescuento] = useState<string>("")
+166:   const [ivaRetenido, setIvaRetenido] = useState<string>("")
+167:   const [isrRetenido, setIsrRetenido] = useState<string>("")
+168:   const [notaCapturista, setNotaCapturista] = useState<string>("")
+169: 
+170:   const handleDelete = async () => {
+171:     if (!gastoToDelete) return
+172:     startTransition(async () => {
+173:       const res = await deleteContratistaGastoFromModule(gastoToDelete.id)
+174:       if (res.success) {
+175:         sileo.success({ title: "Gasto eliminado exitosamente" })
+176:       } else {
+177:         sileo.error({ title: res.error || "Error al eliminar gasto" })
+178:       }
+179:       setIsDeleteDialogOpen(false)
+180:     })
+181:   }
+182: 
+183:   const parseCurrency = (val: string) => parseFloat(val.replace(/,/g, "")) || 0
+184:   const subNum = parseCurrency(subtotal)
+185: 
+186:   const formatCurrencyInput = (value: string) => {
+187:     let val = value.replace(/[^0-9.]/g, "")
+188:     const parts = val.split(".")
+189:     if (parts.length > 2) {
+190:       val = parts[0] + "." + parts.slice(1).join("")
+191:     }
+192:     if (parts[0]) {
+193:       parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+194:     }
+195:     return parts.join(".")
+196:   }
+197: 
+198:   const handleSubmit = (e: React.FormEvent) => {
+199:     e.preventDefault()
+200: 
+201:     if (!obraId) {
+202:       sileo.error({ title: "Selecciona una obra" })
+203:       return
+204:     }
+205:     if (!fechaStr) {
+206:       sileo.error({ title: "Selecciona la fecha del gasto" })
+207:       return
+208:     }
+209: 
+210:     if (!obras.some(o => o.nombre === obraId.trim()) && !customObras.includes(obraId.trim())) {
+211:       setCustomObras(prev => [...prev, obraId.trim()]);
+212:     }
+213:     if (!concepto.trim()) {
+214:       sileo.error({ title: "Ingresa el concepto del gasto" })
+215:       return
+216:     }
+217:     if (subNum <= 0) {
+218:       sileo.error({ title: "El subtotal debe ser mayor a 0" })
+219:       return
+220:     }
+221: 
+222:     startTransition(async () => {
+223:       const res = await createContratistaGastoFromModule({
+224:         obraId,
+225:         fechaStr,
+226:         concepto,
+227:         proveedor: proveedor || "N/A",
+228:         categoria,
+229:         subtotal: subNum,
+230:         porcentajeIVA,
+231:         ieps: parseCurrency(ieps) || undefined,
+232:         descuento: parseCurrency(descuento) || undefined,
+233:         ivaRetenido: parseCurrency(ivaRetenido) || undefined,
+234:         isrRetenido: parseCurrency(isrRetenido) || undefined,
+235:         notaCapturista,
+236:       })
+237: 
+238:       if (res.success) {
+239:         sileo.success({ title: "Gasto registrado exitosamente" })
+240:         setConcepto("")
+241:         setProveedor("")
+242:         setCategoria("")
+243:         setSubtotal("")
+244:         setIeps("")
+245:         setDescuento("")
+246:         setIvaRetenido("")
+247:         setIsrRetenido("")
+248:         setNotaCapturista("")
+249:       } else {
+250:         sileo.error({ title: res.error || "Error al registrar gasto" })
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:42:08Z
+Completed At: 2026-07-24T21:42:08Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 798
+Total Bytes: 30559
+Showing lines 40 to 60
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+40: import { CardsCrudDialog } from "./CardsCrudDialog"
+41: 
+42: export interface ContratistaGastoItem {
+43:   id: string
+44:   fecha: string
+45:   fechaFormatted: string
+46:   year: number
+47:   month: number
+48:   obraId: string
+49:   obraNombre: string
+50:   proveedor: string
+51:   concepto: string
+52:   categoria: string | null
+53:   subtotal: number
+54:   porcentajeIVA: number
+55:   iva: number
+56:   total: number
+57:   subtotal8?: number
+58:   subtotal16?: number
+59:   subtotal0?: number
+60:   iva8?: number
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:42:14Z
+Completed At: 2026-07-24T21:42:14Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 798
+Total Bytes: 30559
+Showing lines 42 to 85
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+42: export interface ContratistaGastoItem {
+43:   id: string
+44:   fecha: string
+45:   fechaFormatted: string
+46:   year: number
+47:   month: number
+48:   obraId: string
+49:   obraNombre: string
+50:   proveedor: string
+51:   concepto: string
+52:   categoria: string | null
+53:   subtotal: number
+54:   porcentajeIVA: number
+55:   iva: number
+56:   total: number
+57:   subtotal8?: number
+58:   subtotal16?: number
+59:   subtotal0?: number
+60:   iva8?: number
+61:   iva16?: number
+62:   ieps?: number
+63:   descuento?: number
+64:   ivaRetenido?: number
+65:   isrRetenido?: number
+66:   notaCapturista: string | null
+67:   creadoPorNombre: string
+68:   estado: string
+69: }
+70: 
+71: export interface ObraOption {
+72:   id: string
+73:   nombre: string
+74: }
+75: 
+76: export interface CardConfig {
+77:   id: string
+78:   type: "normal" | "custom"
+79:   obraId: string
+80:   keyword?: string
+81:   titulo?: string
+82:   isEnabled?: boolean
+83: }
+84: 
+85: interface ContratistasSpreadsheetClientProps {
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:44:07Z
+Completed At: 2026-07-24T21:44:07Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 787
+Total Bytes: 30352
+Showing lines 240 to 340
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+240:     return initialGastos.filter((g) => {
+241:       if (selectedYear !== "all" && g.year !== parseInt(selectedYear, 10)) return false
+242:       if (selectedMonth !== "all" && g.month !== parseInt(selectedMonth, 10)) return false
+243:       if (selectedObra !== "all" && g.obraId !== selectedObra) return false
+244:       if (searchTerm.trim()) {
+245:         const query = searchTerm.toLowerCase()
+246:         const matchConcepto = g.concepto.toLowerCase().includes(query)
+247:         const matchProveedor = (g.proveedor || "").toLowerCase().includes(query)
+248:         const matchObra = g.obraNombre.toLowerCase().includes(query)
+249:         const matchNota = (g.trabajoRealizado || "").toLowerCase().includes(query)
+250:         const matchCategoria = (g.categoria || "").toLowerCase().includes(query)
+251:         if (!matchConcepto && !matchProveedor && !matchObra && !matchNota && !matchCategoria) {
+252:           return false
+253:         }
+254:       }
+255:       return true
+256:     })
+257:   }, [initialGastos, selectedYear, selectedMonth, selectedObra, searchTerm])
+258: 
+259:   // Sorted expenses
+260:   const sortedGastos = useMemo(() => {
+261:     return [...filteredGastos].sort((a, b) => {
+262:       let valA: any = a[sortField]
+263:       let valB: any = b[sortField]
+264: 
+265:       if (typeof valA === "string") {
+266:         valA = valA.toLowerCase()
+267:         valB = (valB || "").toLowerCase()
+268:       }
+269: 
+270:       if (valA < valB) return sortDirection === "asc" ? -1 : 1
+271:       if (valA > valB) return sortDirection === "asc" ? 1 : -1
+272:       
+273:       // Secondary sort by fecha if primary fields are equal (or if we are grouping by proveedor)
+274:       if (sortField !== "fecha") {
+275:         if (a.fecha > b.fecha) return -1
+276:         if (a.fecha < b.fecha) return 1
+277:       }
+278:       return 0
+279:     })
+280:   }, [filteredGastos, sortField, sortDirection])
+281: 
+282:   // Calculate historical totals for all NORMAL obras to pass to modal
+283:   const allObrasCardsData = useMemo(() => {
+284:     return obras
+285:       .filter(obra => !cards.some(c => c.id === obra.id && (c as any).type === "deleted_normal"))
+286:       .map(obra => {
+287:         const totalBruto = initialGastos
+288:           .filter(g => g.obraId === obra.id || g.obraNombre.toLowerCase() === obra.nombre.toLowerCase())
+289:           .reduce((sum, g) => sum + (g.total || 0), 0)
+290:         return { id: obra.id, type: "normal" as const, obraId: obra.id, nombre: obra.nombre, totalBruto }
+291:       })
+292:   }, [initialGastos, obras, cards])
+293: 
+294:   // Calculate totals for Custom Cards currently in state
+295:   const customCardsData = useMemo(() => {
+296:     return cards.filter(c => c.type === "custom").map(card => {
+297:       const match = obras.find(o => o.id === card.obraId)
+298:       const baseNombre = match ? match.nombre : card.obraId.toUpperCase()
+299:       const displayName = card.titulo || `${baseNombre} (${card.keyword})`
+300: 
+301:       const totalBruto = initialGastos.filter(g => {
+302:         const matchesObra = g.obraId === card.obraId || g.obraNombre.toLowerCase() === card.obraId.toLowerCase()
+303:         if (!matchesObra) return false
+304:         if (card.keyword && g.trabajoRealizado) {
+305:           return g.trabajoRealizado.toLowerCase().includes(card.keyword.toLowerCase())
+306:         }
+307:         return false
+308:       }).reduce((sum, g) => sum + (g.total || 0), 0)
+309: 
+310:       return { ...card, nombre: displayName, totalBruto }
+311:     })
+312:   }, [cards, initialGastos, obras])
+313: 
+314:   // All valid cards to display on main dashboard
+315:   const activeCardsData = useMemo(() => {
+316:     const normals = allObrasCardsData.filter(card => 
+317:       cards.some(c => c.type === "normal" && c.id === card.id && c.isEnabled !== false)
+318:     )
+319:     const customs = customCardsData.filter(c => c.isEnabled !== false)
+320:     return [...normals, ...customs]
+321:   }, [allObrasCardsData, customCardsData, cards])
+322: 
+323:   const columns: ColumnDef<ContratistaGastoItem>[] = useMemo(() => [
+324:     {
+325:       id: "fecha",
+326:       sortKey: "fecha",
+327:       label: "Fecha",
+328:       width: "5%",
+329:       render: (row) => (
+330:         <td key="fecha" className="w-[4%] px-2 py-3 font-mono text-[10px] text-muted-foreground truncate">
+331:           {row.fechaFormatted || row.fechaStr}
+332:         </td>
+333:       ),
+334:     },
+335:     {
+336:       id: "obraNombre",
+337:       sortKey: "obraNombre",
+338:       label: "Obra",
+339:       width: "8%",
+340:       render: (row) => (
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:47:50Z
+Completed At: 2026-07-24T21:47:50Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 787
+Total Bytes: 30352
+Showing lines 120 to 160
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+120:     "periodo",
+121:     "trabajoRealizado",
+122:     "contratista",
+123:     "total"
+124:   ])
+125: 
+126:   // Form states
+127:   const [isPending, startTransition] = useTransition()
+128:   const [obraId, setObraId] = useState<string>("")
+129:   const [customObras, setCustomObras] = useState<string[]>([])
+130:   
+131:   // Extract unique proveedores from initialGastos
+132:   const uniqueContratistas = useMemo(() => {
+133:     const conts = initialGastos.map(g => g.contratista).filter(Boolean)
+134:     return Array.from(new Set(conts)).sort((a, b) => a.localeCompare(b))
+135:   }, [initialGastos])
+136: 
+137:   // Delete state
+138:   const [gastoToDelete, setGastoToDelete] = useState<ContratistaGastoItem | null>(null)
+139:   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+140:   
+141:   // Card Disable State
+142:   const [cardToDisable, setCardToDisable] = useState<{ id: string, nombre: string, type: "normal" | "custom" } | null>(null)
+143:   const [isCardDisableDialogOpen, setIsCardDisableDialogOpen] = useState(false)
+144: 
+145:   const [fechaStr, setFechaStr] = useState<string>(
+146:     new Date().toISOString().split("T")[0]
+147:   )
+148:   const [periodo, setPeriodo] = useState<string>("")
+149:   const [trabajoRealizado, setTrabajoRealizado] = useState<string>("")
+150:   const [contratista, setContratista] = useState<string>("")
+151:   const [total, setTotal] = useState<string>("")
+152: 
+153:   const handleDelete = async () => {
+154:     if (!gastoToDelete) return
+155:     startTransition(async () => {
+156:       const res = await deleteContratistaGastoFromModule(gastoToDelete.id)
+157:       if (res.success) {
+158:         sileo.success({ title: "Gasto eliminado exitosamente" })
+159:       } else {
+160:         sileo.error({ title: res.error || "Error al eliminar gasto" })
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:47:56Z
+Completed At: 2026-07-24T21:47:56Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 787
+Total Bytes: 30352
+Showing lines 90 to 120
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+90:   initialCards = [],
+91: }: ContratistasSpreadsheetClientProps) {
+92:   // Filter states
+93:   const [selectedYear, setSelectedYear] = useState<string>("all")
+94:   const [selectedMonth, setSelectedMonth] = useState<string>("all")
+95:   const [selectedObra, setSelectedObra] = useState<string>("all")
+96:   const [searchTerm, setSearchTerm] = useState<string>("")
+97:   
+98:   // Normalize initial cards (backwards compatibility for old string[] saves)
+99:   const normalizedCards = useMemo<CardConfig[]>(() => {
+100:     return initialCards.map(c => {
+101:       if (typeof c === "string") {
+102:         return { id: c, type: "normal", obraId: c, isEnabled: true }
+103:       }
+104:       return c as CardConfig
+105:     })
+106:   }, [initialCards])
+107: 
+108:   const [cards, setCards] = useState<CardConfig[]>(normalizedCards)
+109:   const [isCardsDialogOpen, setIsCardsDialogOpen] = useState(false)
+110: 
+111:   // Sort states from URL
+112:   const searchParams = useSearchParams()
+113:   const sortField = (searchParams.get("sortBy") as keyof ContratistaGastoItem) || "fecha"
+114:   const sortDirection = (searchParams.get("sortOrder") as "asc" | "desc") || "desc"
+115: 
+116:   // Visible columns state
+117:   const [visibleColumns, setVisibleColumns] = useState<string[]>([
+118:     "fecha",
+119:     "obraNombre",
+120:     "periodo",
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:48:02Z
+Completed At: 2026-07-24T21:48:02Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 787
+Total Bytes: 30352
+Showing lines 410 to 450
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+410:           </h1>
+411:         </div>
+412:         <div className="flex items-center gap-3">
+413:           <a href="/admin/gastos">
+414:             <Button variant="secondary" className="rounded-xl px-6 shadow-sm border border-border/50 bg-muted/30">
+415:               Gastos Generales
+416:             </Button>
+417:           </a>
+418:         </div>
+419:       </div>
+420: 
+421:       {/* Cards Section */}
+422:       {activeCardsData.length > 0 && (
+423:         <div className="flex flex-wrap justify-center gap-4 mt-2">
+424:           {activeCardsData.map(card => (
+425:             <div key={card.id} className="w-[240px]">
+426:               <ObraSummaryCard
+427:                 nombre={card.nombre}
+428:                 totalBruto={card.totalBruto}
+429:                 isActive={true}
+430:                 onClick={() => {
+431:                   setCardToDisable({ id: card.id, nombre: card.nombre, type: card.type as "normal" | "custom" })
+432:                   setIsCardDisableDialogOpen(true)
+433:                 }}
+434:               />
+435:             </div>
+436:           ))}
+437:         </div>
+438:       )}
+439: 
+440:       {/* Action Bar (Search, Filtros, Columnas) */}
+441:       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+442:         <div className="flex flex-1 items-center gap-3">
+443:           <div className="relative w-full max-w-sm">
+444:             <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+445:             <Input
+446:               type="text"
+447:               placeholder="Buscar concepto, obra..."
+448:               value={searchTerm}
+449:               onChange={(e) => setSearchTerm(e.target.value)}
+450:               className="rounded-2xl border-border/40 bg-muted/60 pl-9 text-xs h-10"
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T21:54:06Z
+Completed At: 2026-07-24T21:54:06Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 788
+Total Bytes: 30397
+Showing lines 160 to 230
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+160:         sileo.error({ title: res.error || "Error al eliminar gasto" })
+161:       }
+162:       setIsDeleteDialogOpen(false)
+163:     })
+164:   }
+165: 
+166:   const parseCurrency = (val: string) => parseFloat(val.replace(/,/g, "")) || 0
+167:   const totalNum = parseCurrency(total)
+168: 
+169:   const formatCurrencyInput = (value: string) => {
+170:     let val = value.replace(/[^0-9.]/g, "")
+171:     const parts = val.split(".")
+172:     if (parts.length > 2) {
+173:       val = parts[0] + "." + parts.slice(1).join("")
+174:     }
+175:     if (parts[0]) {
+176:       parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+177:     }
+178:     return parts.join(".")
+179:   }
+180: 
+181:   const handleSubmit = (e: React.FormEvent) => {
+182:     e.preventDefault()
+183: 
+184:     if (!obraId) {
+185:       sileo.error({ title: "Selecciona una obra" })
+186:       return
+187:     }
+188:     if (!fechaStr) {
+189:       sileo.error({ title: "Selecciona la fecha del gasto" })
+190:       return
+191:     }
+192: 
+193:     if (!obras.some(o => o.nombre === obraId.trim()) && !customObras.includes(obraId.trim())) {
+194:       setCustomObras(prev => [...prev, obraId.trim()]);
+195:     }
+196:     if (!concepto.trim()) {
+197:       sileo.error({ title: "Ingresa el concepto del gasto" })
+198:       return
+199:     }
+200:     if (subNum <= 0) {
+201:       sileo.error({ title: "El subtotal debe ser mayor a 0" })
+202:       return
+203:     }
+204: 
+205:     startTransition(async () => {
+206:       const res = await createContratistaGastoFromModule({
+207:         obraId,
+208:         fechaStr,
+209:         concepto,
+210:         proveedor: proveedor || "N/A",
+211:         categoria,
+212:         subtotal: subNum,
+213:         porcentajeIVA,
+214:         ieps: parseCurrency(ieps) || undefined,
+215:         descuento: parseCurrency(descuento) || undefined,
+216:         ivaRetenido: parseCurrency(ivaRetenido) || undefined,
+217:         isrRetenido: parseCurrency(isrRetenido) || undefined,
+218:         notaCapturista,
+219:       })
+220: 
+221:       if (res.success) {
+222:         sileo.success({ title: "Gasto registrado exitosamente" })
+223:         setConcepto("")
+224:         setProveedor("")
+225:         setCategoria("")
+226:         setSubtotal("")
+227:         setIeps("")
+228:         setDescuento("")
+229:         setIvaRetenido("")
+230:         setIsrRetenido("")
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:16:37Z
+Completed At: 2026-07-24T22:16:38Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 492
+Total Bytes: 16718
+Showing lines 492 to 492
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+492: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:16:44Z
+Completed At: 2026-07-24T22:16:44Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 492
+Total Bytes: 16718
+Showing lines 1 to 100
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: "use client"
+2: 
+3: import React, { useState, useMemo, useTransition } from "react"
+4: import { Input } from "@/components/ui/input"
+5: import { Button } from "@/components/ui/button"
+6: import { DataTable, ColumnDef } from "@/app/components/DataTable"
+7: import { useSearchParams } from "next/navigation"
+8: import { Search, Plus, CalendarIcon, MoreVertical, LayoutGrid, List, FileText, ChevronDown, Check, Building, Layers, CircleDollarSign, Percent, Wallet, MessageSquare, Trash2, ArchiveRestore, User, Settings2, Filter, Loader2, LayoutPanelTop } from "lucide-react"
+9: import { ComboboxInput } from "@/components/ui/combobox-input"
+10: import { ObraSummaryCard } from "@/components/ui/obra-summary-card"
+11: import { formatCurrency } from "@/lib/formatters"
+12: import { sileo } from "sileo"
+13: import {
+14:   Select,
+15:   SelectContent,
+16:   SelectItem,
+17:   SelectTrigger,
+18:   SelectValue,
+19: } from "@/components/ui/select"
+20: import {
+21:   DropdownMenu,
+22:   DropdownMenuCheckboxItem,
+23:   DropdownMenuContent,
+24:   DropdownMenuGroup,
+25:   DropdownMenuTrigger,
+26: } from "@/components/ui/dropdown-menu"
+27: import {
+28:   Popover,
+29:   PopoverContent,
+30:   PopoverTrigger,
+31: } from "@/components/ui/popover"
+32: import { Calendar } from "@/components/ui/calendar"
+33: import { format } from "date-fns"
+34: import { es } from "date-fns/locale"
+35: import { cn } from "@/lib/utils"
+36: import { Label } from "@/components/ui/label"
+37: import { createContratistaGastoFromModule, deleteContratistaGastoFromModule } from "@/lib/actions/contratistas-module"
+38: import { saveContratistaCards } from "@/lib/actions/contratistas-cards"
+39: import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+40: import { CardsCrudDialog } from "./CardsCrudDialog"
+41: import { EditContratistaDialog } from "./EditContratistaDialog"
+42: 
+43: export interface ContratistaGastoItem {
+44:   id: string
+45:   fecha: string
+46:   fechaStr: string
+47:   fechaFormatted?: string
+48:   year: number
+49:   obraNombre: string
+50:   periodo: string | null
+51:   trabajoRealizado: string | null
+52:   contratista: string
+53:   total: number
+54:   creadoPorId: string
+55:   creadoPorNombre: string
+56:   createdAt: any
+57:   updatedAt: any
+58:   isDeleted: boolean
+59: }
+60: 
+61: export interface ObraOption {
+62:   id: string
+63:   nombre: string
+64: }
+65: 
+66: export interface CardConfig {
+67:   id: string
+68:   type: "normal" | "custom"
+69:   obraId: string
+70:   keyword?: string
+71:   titulo?: string
+72:   isEnabled?: boolean
+73: }
+74: 
+75: interface ContratistasSpreadsheetClientProps {
+76:   initialGastos: ContratistaGastoItem[]
+77:   obras: ObraOption[]
+78:   availableYears: number[]
+79:   initialCards?: any[]
+80: }
+81: 
+82: const MONTH_NAMES = [
+83:   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+84:   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+85: ]
+86: 
+87: export default function ContratistasSpreadsheetClient({
+88:   initialGastos,
+89:   obras,
+90:   availableYears,
+91:   initialCards = [],
+92: }: ContratistasSpreadsheetClientProps) {
+93:   // Filter states
+94:   const [selectedYear, setSelectedYear] = useState<string>("all")
+95:   const [selectedMonth, setSelectedMonth] = useState<string>("all")
+96:   const [selectedObra, setSelectedObra] = useState<string>("all")
+97:   const [searchTerm, setSearchTerm] = useState<string>("")
+98:   
+99:   // Normalize initial cards (backwards compatibility for old string[] saves)
+100:   const normalizedCards = useMemo<CardConfig[]>(() => {
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:17:13Z
+Completed At: 2026-07-24T22:17:13Z
+File Path: `file:///d:/SPEND/CONTROL2-1/scripts/fix-client3.cjs`
+Total Lines: 200
+Total Bytes: 7827
+Showing lines 1 to 100
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: const fs = require('fs');
+2: let c = fs.readFileSync('app/admin/contratistas/ContratistasSpreadsheetClient.tsx', 'utf-8');
+3: 
+4: // Replace uniqueProveedores
+5: c = c.replace(/const uniqueProveedores = useMemo\(\(\) => \{[\s\S]*?\}, \[initialGastos\]\)/, `const uniqueContratistas = useMemo(() => {
+6:     const conts = initialGastos.map(g => g.contratista).filter(Boolean)
+7:     return Array.from(new Set(conts)).sort((a, b) => a.localeCompare(b))
+8:   }, [initialGastos])`);
+9: 
+10: // Replace form state
+11: const formStateRegex = /const \[concepto, setConcepto\][\s\S]*?const \[notaCapturista, setNotaCapturista\] = useState<string>\(""\)/;
+12: c = c.replace(formStateRegex, `const [periodo, setPeriodo] = useState<string>("")
+13:   const [trabajoRealizado, setTrabajoRealizado] = useState<string>("")
+14:   const [contratista, setContratista] = useState<string>("")
+15:   const [total, setTotal] = useState<string>("")`);
+16: 
+17: // Replace subNum parse
+18: c = c.replace(/const subNum = parseCurrency\(subtotal\)/, 'const totalNum = parseCurrency(total)');
+19: 
+20: // Replace handleSubmit logic
+21: const submitRegex = /const handleSubmit = \(e: React\.FormEvent\) => \{[\s\S]*?setIsDeleteDialogOpen\(false\)\n\s*\}/;
+22: c = c.replace(submitRegex, `const handleSubmit = (e: React.FormEvent) => {
+23:     e.preventDefault()
+24: 
+25:     if (!obraId) {
+26:       sileo.error({ title: "Selecciona una obra" })
+27:       return
+28:     }
+29:     if (!fechaStr) {
+30:       sileo.error({ title: "Selecciona la fecha del pago" })
+31:       return
+32:     }
+33: 
+34:     if (!obras.some(o => o.nombre === obraId.trim()) && !customObras.includes(obraId.trim())) {
+35:       setCustomObras(prev => [...prev, obraId.trim()]);
+36:     }
+37:     if (!trabajoRealizado.trim()) {
+38:       sileo.error({ title: "Ingresa el trabajo realizado" })
+39:       return
+40:     }
+41:     if (totalNum <= 0) {
+42:       sileo.error({ title: "El total debe ser mayor a 0" })
+43:       return
+44:     }
+45: 
+46:     startTransition(async () => {
+47:       const res = await createContratistaGastoFromModule({
+48:         obraNombre: obraId,
+49:         fechaStr,
+50:         periodo,
+51:         trabajoRealizado,
+52:         contratista: contratista || "N/A",
+53:         total: totalNum,
+54:       })
+55: 
+56:       if (res.success) {
+57:         sileo.success({ title: "Pago registrado exitosamente" })
+58:         setTrabajoRealizado("")
+59:         setPeriodo("")
+60:         setContratista("")
+61:         setTotal("")
+62:       } else {
+63:         sileo.error({ title: res.error || "Error al registrar pago" })
+64:       }
+65:     })
+66:   }
+67: 
+68:   const handleDelete = async () => {
+69:     if (!gastoToDelete) return
+70:     startTransition(async () => {
+71:       const res = await deleteContratistaGastoFromModule(gastoToDelete.id)
+72:       if (res.success) {
+73:         sileo.success({ title: "Gasto eliminado exitosamente" })
+74:       } else {
+75:         sileo.error({ title: res.error || "Error al eliminar gasto" })
+76:       }
+77:       setIsDeleteDialogOpen(false)
+78:     })
+79:   }`);
+80: 
+81: // Replace the JSX form
+82: const formJsxRegex = /\{\/\* Inline Create Form \*\/\}\n\s*<div className="rounded-3xl bg-card\/70 p-4 shadow-lg backdrop-blur-xl">[\s\S]*?<\/form>\n\s*<\/div>/;
+83: 
+84: c = c.replace(formJsxRegex, `{/* Inline Create Form */}
+85:       <div className="rounded-3xl bg-card/70 p-4 shadow-lg backdrop-blur-xl">
+86:         <form id="registro-gasto-form" onSubmit={handleSubmit} className="flex flex-wrap gap-4 items-end">
+87:           
+88:           {/* Obra */}
+89:           <ComboboxInput
+90:             label="Obra"
+91:             value={obraId}
+92:             onChange={setObraId}
+93:             options={[...obras.map(o => o.nombre), ...customObras]}
+94:             className="flex-[1_1_200px]"
+95:             required
+96:           />
+97: 
+98:           {/* Fecha */}
+99:           <div className="space-y-1.5 flex flex-col w-[160px] shrink-0">
+100:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Fecha</Label>
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:17:20Z
+Completed At: 2026-07-24T22:17:20Z
+File Path: `file:///d:/SPEND/CONTROL2-1/scripts/fix-client-ts.cjs`
+Total Lines: 25
+Total Bytes: 654
+Showing lines 1 to 25
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: const fs = require('fs');
+2: let c = fs.readFileSync('app/admin/contratistas/ContratistasSpreadsheetClient.tsx', 'utf-8');
+3: 
+4: c = c.replace(/export interface ContratistaGastoItem \{[\s\S]*?\}\n/, `export interface ContratistaGastoItem {
+5:   id: string
+6:   fecha: string
+7:   fechaStr: string
+8:   fechaFormatted?: string
+9:   year: number
+10:   obraNombre: string
+11:   periodo: string | null
+12:   trabajoRealizado: string | null
+13:   contratista: string
+14:   total: number
+15:   creadoPorId: string
+16:   creadoPorNombre: string
+17:   createdAt: any
+18:   updatedAt: any
+19:   isDeleted: boolean
+20: }
+21: `);
+22: 
+23: fs.writeFileSync('app/admin/contratistas/ContratistasSpreadsheetClient.tsx', c);
+24: console.log("Success");
+25: 
+The above content shows the entire, complete file contents of the requested file.
+
+
+====================
+
+Created At: 2026-07-24T22:17:48Z
+Completed At: 2026-07-24T22:17:48Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 492
+Total Bytes: 16718
+Showing lines 450 to 492
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+450:             const res = await saveContratistaCards(updated)
+451:             if (!res.success) {
+452:               sileo.error({ title: "Error al apagar tarjeta" })
+453:               setCards(cards) // Revert
+454:             } else {
+455:               sileo.success({ title: "Tarjeta apagada" })
+456:             }
+457:           })
+458:         }}
+459:       />
+460: 
+461: 
+462: 
+463:       <DataTable
+464:         data={sortedGastos}
+465:         columns={columns}
+466:         visibleColumns={visibleColumns}
+467:         keyExtractor={(row) => row.id}
+468:         maxHeight="calc(100vh - 280px)"
+469:         batchSize={100}
+470:         totalFilteredCount={filteredGastos.length}
+471:         totalCount={initialGastos.length}
+472:         isFiltered={filteredGastos.length !== initialGastos.length}
+473:         emptyMessage="No se encontraron gastos para el periodo u obra seleccionados."
+474:         tableLayout="fixed"
+475:         onRowClick={(row) => {
+476:           setGastoToEdit(row)
+477:           setIsEditDialogOpen(true)
+478:         }}
+479:       />
+480: 
+481:       <CardsCrudDialog
+482:         open={isCardsDialogOpen}
+483:         onOpenChange={setIsCardsDialogOpen}
+484:         obras={obras}
+485:         allCardsData={[...allObrasCardsData, ...customCardsData]}
+486:         activeCards={cards}
+487:         onCardsChange={setCards}
+488:       />
+489:     </div>
+490:   )
+491: }
+492: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:17:55Z
+Completed At: 2026-07-24T22:17:55Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 492
+Total Bytes: 16718
+Showing lines 400 to 440
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+400:       )}
+401: 
+402:       {/* Action Bar (Search, Filtros, Columnas) */}
+403:       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+404:         <div className="flex flex-1 items-center gap-3">
+405:           <div className="relative w-full max-w-sm">
+406:             <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+407:             <Input
+408:               type="text"
+409:               placeholder="Buscar concepto, obra..."
+410:               value={searchTerm}
+411:               onChange={(e) => setSearchTerm(e.target.value)}
+412:               className="rounded-2xl border-border/40 bg-muted/60 pl-9 text-xs h-10"
+413:             />
+414:           </div>
+415:         </div>
+416:       </div>
+417: 
+418:       <EditContratistaDialog
+419:         open={isEditDialogOpen}
+420:         onOpenChange={setIsEditDialogOpen}
+421:         gasto={gastoToEdit}
+422:         obras={obras}
+423:         onSuccess={() => {
+424:           setGastoToEdit(null)
+425:           setIsEditDialogOpen(false)
+426:         }}
+427:       />
+428: 
+429:       <ConfirmDialog
+430:         open={isCardDisableDialogOpen}
+431:         onOpenChange={setIsCardDisableDialogOpen}
+432:         title="Apagar Tarjeta"
+433:         description={`¿Quieres apagar la tarjeta "${cardToDisable?.nombre}" y ocultarla de la pantalla principal?\n\nPuedes volver a encenderla en cualquier momento desde el menú de Tarjetas.`}
+434:         confirmText="Apagar"
+435:         cancelText="Cancelar"
+436:         variant="destructive"
+437:         onConfirm={() => {
+438:           if (!cardToDisable) return
+439:           startTransition(async () => {
+440:             const exists = cards.find(c => c.id === cardToDisable.id && c.type === cardToDisable.type)
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:19:06Z
+Completed At: 2026-07-24T22:19:06Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 960
+Total Bytes: 36296
+Showing lines 720 to 850
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+720:               const workbook = new ExcelJS.Workbook()
+721:               const worksheet = workbook.addWorksheet("Gastos")
+722:               
+723:               worksheet.columns = columns
+724:                 .filter(c => visibleColumns.includes(c.id))
+725:                 .map(c => ({
+726:                   header: c.label,
+727:                   key: c.id,
+728:                   width: 15
+729:                 }))
+730:               
+731:               filteredGastos.forEach(g => {
+732:                 const rowData: Record<string, any> = {}
+733:                 columns.filter(c => visibleColumns.includes(c.id)).forEach(c => {
+734:                   if (c.id === "fecha") rowData[c.id] = g.fechaFormatted
+735:                   else if (c.id === "obraNombre") rowData[c.id] = g.obraNombre
+736:                   else if (c.id === "proveedor") rowData[c.id] = g.proveedor
+737:                   else if (c.id === "notas") rowData[c.id] = g.notaCapturista
+738:                   else if (c.id === "unidad") rowData[c.id] = g.categoria
+739:                   else if (c.id === "concepto") rowData[c.id] = g.concepto
+740:                   else if (c.id === "subtotal") rowData[c.id] = g.subtotal
+741:                   else if (c.id === "subtotal8") rowData[c.id] = g.subtotal8
+742:                   else if (c.id === "subtotal16") rowData[c.id] = g.subtotal16
+743:                   else if (c.id === "subtotal0") rowData[c.id] = g.subtotal0
+744:                   else if (c.id === "iva") rowData[c.id] = g.porcentajeIVA
+745:                   else if (c.id === "iva8") rowData[c.id] = g.iva8
+746:                   else if (c.id === "iva16") rowData[c.id] = g.iva16
+747:                   else if (c.id === "ieps") rowData[c.id] = g.ieps
+748:                   else if (c.id === "descuento") rowData[c.id] = g.descuento
+749:                   else if (c.id === "ivaRetenido") rowData[c.id] = g.ivaRetenido
+750:                   else if (c.id === "isrRetenido") rowData[c.id] = g.isrRetenido
+751:                   else if (c.id === "total") rowData[c.id] = g.total
+752:                   else if (c.id === "capturista") rowData[c.id] = g.creadoPorNombre
+753:                 })
+754:                 worksheet.addRow(rowData)
+755:               })
+756:               
+757:               const buffer = await workbook.xlsx.writeBuffer()
+758:               const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })
+759:               const url = window.URL.createObjectURL(blob)
+760:               const a = document.createElement("a")
+761:               a.href = url
+762:               a.download = `Gastos_Export_${new Date().toISOString().split("T")[0]}.xlsx`
+763:               a.click()
+764:               window.URL.revokeObjectURL(url)
+765:               sileo.success({ title: "Exportación completada" })
+766:             }}
+767:           >
+768:             Excel
+769:           </Button>
+770:         </div>
+771:       </div>
+772: 
+773: 
+774:       {/* Inline Create Form */}
+775:       <div className="rounded-3xl bg-card/70 p-4 shadow-lg backdrop-blur-xl">
+776:         <form id="registro-gasto-form" onSubmit={handleSubmit} className="flex flex-wrap gap-4 items-end">
+777:           
+778:           {/* Obra */}
+779:           <ComboboxInput
+780:             label="Obra"
+781:             value={obraId}
+782:             onChange={setObraId}
+783:             options={[...obras.map(o => o.nombre), ...customObras]}
+784:             className="flex-[1_1_200px]"
+785:             required
+786:           />
+787: 
+788:           {/* Fecha */}
+789:           <div className="space-y-1.5 flex flex-col w-[160px] shrink-0">
+790:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Fecha</Label>
+791:             <Popover>
+792:               <PopoverTrigger asChild>
+793:                 <Button
+794:                   variant="ghost"
+795:                   className={cn(
+796:                     "w-full justify-start text-left font-normal rounded-2xl border-none bg-muted/60 px-3 py-2 text-xs text-foreground hover:bg-muted focus:ring-1 focus:ring-ring h-[36px]",
+797:                     !fechaStr && "text-muted-foreground"
+798:                   )}
+799:                 >
+800:                   <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+801:                   {fechaStr ? format(new Date(fechaStr + "T12:00:00"), "dd/MM/yyyy", { locale: es }) : <span>Fecha</span>}
+802:                 </Button>
+803:               </PopoverTrigger>
+804:               <PopoverContent className="w-auto p-0 rounded-2xl border-border/50 bg-card shadow-2xl backdrop-blur-xl" align="start">
+805:                 <Calendar
+806:                   mode="single"
+807:                   selected={fechaStr ? new Date(fechaStr + "T12:00:00") : undefined}
+808:                   onSelect={(date) => {
+809:                     if (date) setFechaStr(date.toISOString().split("T")[0])
+810:                   }}
+811:                   className="p-3"
+812:                 />
+813:               </PopoverContent>
+814:             </Popover>
+815:           </div>
+816: 
+817:           {/* Periodo */}
+818:           <div className="space-y-1.5 w-[160px] shrink-0">
+819:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Periodo</Label>
+820:             <Input
+821:               type="text"
+822:               placeholder="01 ENE - 07 ENE"
+823:               value={periodo}
+824:               onChange={(e) => setPeriodo(e.target.value)}
+825:               className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full"
+826:             />
+827:           </div>
+828: 
+829:           {/* Contratista */}
+830:           <ComboboxInput
+831:             label="Contratista"
+832:             value={contratista}
+833:             onChange={setContratista}
+834:             options={uniqueContratistas}
+835:             placeholder="Jacobo Callejas..."
+836:             className="flex-[1_1_200px]"
+837:           />
+838: 
+839:           {/* Trabajo Realizado */}
+840:           <div className="space-y-1.5 flex-[2_2_300px]">
+841:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Trabajo Realizado</Label>
+842:             <Input
+843:               type="text"
+844:               placeholder="Descripción del trabajo..."
+845:               value={trabajoRealizado}
+846:               onChange={(e) => setTrabajoRealizado(e.target.value)}
+847:               className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full"
+848:               required
+849:             />
+850:           </div>
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:19:11Z
+Completed At: 2026-07-24T22:19:11Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 960
+Total Bytes: 36296
+Showing lines 850 to 960
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+850:           </div>
+851: 
+852:           {/* Total */}
+853:           <div className="space-y-1.5 w-[140px] shrink-0">
+854:             <Label className="text-[10px] font-semibold text-muted-foreground uppercase">Total ($)</Label>
+855:             <div className="relative">
+856:               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium pointer-events-none">$</span>
+857:               <Input
+858:                 type="text"
+859:                 placeholder="0.00"
+860:                 value={total}
+861:                 onChange={(e) => setTotal(formatCurrencyInput(e.target.value))}
+862:                 className="rounded-2xl bg-muted/60 text-xs h-[36px] border-none w-full pl-6"
+863:                 required
+864:               />
+865:             </div>
+866:           </div>
+867: 
+868:           <Button
+869:             type="submit"
+870:             form="registro-gasto-form"
+871:             disabled={isPending}
+872:             size="icon"
+873:             className="h-[36px] w-[36px] rounded-2xl bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95 shrink-0"
+874:             title="Registrar Pago"
+875:           >
+876:             {isPending ? (
+877:               <Loader2 className="h-4 w-4 animate-spin" />
+878:             ) : (
+879:               <Plus className="h-5 w-5" />
+880:             )}
+881:           </Button>
+882:         </form>
+883:       </div>
+884: 
+885:       <EditContratistaDialog
+886:         open={isEditDialogOpen}
+887:         onOpenChange={setIsEditDialogOpen}
+888:         gasto={gastoToEdit}
+889:         obras={obras}
+890:         uniqueProveedores={uniqueProveedores}
+891:         onSuccess={() => {
+892:           setGastoToEdit(null)
+893:           setIsEditDialogOpen(false)
+894:         }}
+895:       />
+896: 
+897:       <ConfirmDialog
+898:         open={isCardDisableDialogOpen}
+899:         onOpenChange={setIsCardDisableDialogOpen}
+900:         title="Apagar Tarjeta"
+901:         description={`¿Quieres apagar la tarjeta "${cardToDisable?.nombre}" y ocultarla de la pantalla principal?\n\nPuedes volver a encenderla en cualquier momento desde el menú de Tarjetas.`}
+902:         confirmText="Apagar"
+903:         cancelText="Cancelar"
+904:         variant="destructive"
+905:         onConfirm={() => {
+906:           if (!cardToDisable) return
+907:           startTransition(async () => {
+908:             const exists = cards.find(c => c.id === cardToDisable.id && c.type === cardToDisable.type)
+909:             let updated: any[]
+910:             if (exists) {
+911:               updated = cards.map(c => c === exists ? { ...c, isEnabled: false } : c)
+912:             } else {
+913:               updated = [...cards, { id: cardToDisable.id, type: "normal", obraId: cardToDisable.id, isEnabled: false }]
+914:             }
+915:             
+916:             // Optimistic update
+917:             setCards(updated)
+918:             const res = await saveContratistaCards(updated)
+919:             if (!res.success) {
+920:               sileo.error({ title: "Error al apagar tarjeta" })
+921:               setCards(cards) // Revert
+922:             } else {
+923:               sileo.success({ title: "Tarjeta apagada" })
+924:             }
+925:           })
+926:         }}
+927:       />
+928: 
+929: 
+930: 
+931:       <DataTable
+932:         data={sortedGastos}
+933:         columns={columns}
+934:         visibleColumns={visibleColumns}
+935:         keyExtractor={(row) => row.id}
+936:         maxHeight="calc(100vh - 280px)"
+937:         batchSize={100}
+938:         totalFilteredCount={filteredGastos.length}
+939:         totalCount={initialGastos.length}
+940:         isFiltered={filteredGastos.length !== initialGastos.length}
+941:         emptyMessage="No se encontraron gastos para el periodo u obra seleccionados."
+942:         tableLayout="fixed"
+943:         onRowClick={(row) => {
+944:           setGastoToEdit(row)
+945:           setIsEditDialogOpen(true)
+946:         }}
+947:       />
+948: 
+949:       <CardsCrudDialog
+950:         open={isCardsDialogOpen}
+951:         onOpenChange={setIsCardsDialogOpen}
+952:         obras={obras}
+953:         allCardsData={[...allObrasCardsData, ...customCardsData]}
+954:         activeCards={cards}
+955:         onCardsChange={setCards}
+956:       />
+957:     </div>
+958:   )
+959: }
+960: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:22:06Z
+Completed At: 2026-07-24T22:22:06Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 959
+Total Bytes: 36248
+Showing lines 1 to 100
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: "use client"
+2: 
+3: import React, { useState, useMemo, useTransition } from "react"
+4: import { Input } from "@/components/ui/input"
+5: import { Button } from "@/components/ui/button"
+6: import { DataTable, ColumnDef } from "@/app/components/DataTable"
+7: import { useSearchParams } from "next/navigation"
+8: import { Search, Plus, CalendarIcon, MoreVertical, LayoutGrid, List, FileText, ChevronDown, Check, Building, Layers, CircleDollarSign, Percent, Wallet, MessageSquare, Trash2, ArchiveRestore, User, Settings2, Filter, Loader2, LayoutPanelTop } from "lucide-react"
+9: import { ComboboxInput } from "@/components/ui/combobox-input"
+10: import { ObraSummaryCard } from "@/components/ui/obra-summary-card"
+11: import { formatCurrency } from "@/lib/formatters"
+12: import { sileo } from "sileo"
+13: import {
+14:   Select,
+15:   SelectContent,
+16:   SelectItem,
+17:   SelectTrigger,
+18:   SelectValue,
+19: } from "@/components/ui/select"
+20: import {
+21:   DropdownMenu,
+22:   DropdownMenuCheckboxItem,
+23:   DropdownMenuContent,
+24:   DropdownMenuGroup,
+25:   DropdownMenuTrigger,
+26: } from "@/components/ui/dropdown-menu"
+27: import {
+28:   Popover,
+29:   PopoverContent,
+30:   PopoverTrigger,
+31: } from "@/components/ui/popover"
+32: import { Calendar } from "@/components/ui/calendar"
+33: import { format } from "date-fns"
+34: import { es } from "date-fns/locale"
+35: import { cn } from "@/lib/utils"
+36: import { Label } from "@/components/ui/label"
+37: import { createContratistaGastoFromModule, deleteContratistaGastoFromModule } from "@/lib/actions/contratistas-module"
+38: import { saveContratistaCards } from "@/lib/actions/contratistas-cards"
+39: import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+40: import { CardsCrudDialog } from "./CardsCrudDialog"
+41: import { EditContratistaDialog } from "./EditContratistaDialog"
+42: 
+43: export interface ContratistaGastoItem {
+44:   id: string
+45:   fecha: string
+46:   fechaStr: string
+47:   fechaFormatted?: string
+48:   year: number
+49:   obraNombre: string
+50:   periodo: string | null
+51:   trabajoRealizado: string | null
+52:   contratista: string
+53:   total: number
+54:   creadoPorId: string
+55:   creadoPorNombre: string
+56:   createdAt: any
+57:   updatedAt: any
+58:   isDeleted: boolean
+59: }
+60: 
+61: export interface ObraOption {
+62:   id: string
+63:   nombre: string
+64: }
+65: 
+66: export interface CardConfig {
+67:   id: string
+68:   type: "normal" | "custom"
+69:   obraId: string
+70:   keyword?: string
+71:   titulo?: string
+72:   isEnabled?: boolean
+73: }
+74: 
+75: interface ContratistasSpreadsheetClientProps {
+76:   initialGastos: GastoItem[]
+77:   obras: ObraOption[]
+78:   availableYears: number[]
+79:   initialCards?: any[]
+80:   contratistaGastos?: { obraNombre: string; total: number; trabajoRealizado: string | null }[]
+81: }
+82: 
+83: const MONTH_NAMES = [
+84:   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+85:   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+86: ]
+87: 
+88: export default function ContratistasSpreadsheetClient({
+89:   initialGastos,
+90:   obras,
+91:   availableYears,
+92:   initialCards = [],
+93:   contratistaGastos = [],
+94: }: ContratistasSpreadsheetClientProps) {
+95:   // Filter states
+96:   const [selectedYear, setSelectedYear] = useState<string>("all")
+97:   const [selectedMonth, setSelectedMonth] = useState<string>("all")
+98:   const [selectedObra, setSelectedObra] = useState<string>("all")
+99:   const [searchTerm, setSearchTerm] = useState<string>("")
+100:   
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:22:13Z
+Completed At: 2026-07-24T22:22:13Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 959
+Total Bytes: 36248
+Showing lines 300 to 350
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+300:     return obras
+301:       .filter(obra => !cards.some(c => c.id === obra.id && (c as any).type === "deleted_normal"))
+302:       .map(obra => {
+303:         let totalBruto = initialGastos
+304:           .filter(g => g.obraId === obra.id || g.obraNombre.toLowerCase() === obra.nombre.toLowerCase())
+305:           .reduce((sum, g) => sum + (g.total || 0), 0)
+306:         
+307:         // Add contratistaGastos total
+308:         const extra = contratistaGastos
+309:           .filter(cg => cg.obraNombre.toLowerCase() === obra.nombre.toLowerCase() || cg.obraNombre === obra.id)
+310:           .reduce((sum, cg) => sum + (cg.total || 0), 0)
+311:           
+312:         totalBruto += extra;
+313:           
+314:         return { id: obra.id, type: "normal" as const, obraId: obra.id, nombre: obra.nombre, totalBruto }
+315:       })
+316:   }, [initialGastos, obras, cards, contratistaGastos])
+317: 
+318:   // Calculate totals for Custom Cards currently in state
+319:   const customCardsData = useMemo(() => {
+320:     return cards.filter(c => c.type === "custom").map(card => {
+321:       const match = obras.find(o => o.id === card.obraId)
+322:       const baseNombre = match ? match.nombre : card.obraId.toUpperCase()
+323:       const displayName = card.titulo || `${baseNombre} (${card.keyword})`
+324: 
+325:       let totalBruto = initialGastos.filter(g => {
+326:         const matchesObra = g.obraId === card.obraId || g.obraNombre.toLowerCase() === card.obraId.toLowerCase()
+327:         if (!matchesObra) return false
+328:         if (card.keyword && g.notaCapturista) {
+329:           return g.notaCapturista.toLowerCase().includes(card.keyword.toLowerCase())
+330:         }
+331:         return false
+332:       }).reduce((sum, g) => sum + (g.total || 0), 0)
+333: 
+334:       // Add custom card matches from contratistas
+335:       const extra = contratistaGastos.filter(cg => {
+336:         const matchesObra = cg.obraNombre.toLowerCase() === card.obraId.toLowerCase() || cg.obraNombre === card.obraId
+337:         if (!matchesObra) return false
+338:         if (card.keyword && cg.trabajoRealizado) {
+339:           return cg.trabajoRealizado.toLowerCase().includes(card.keyword.toLowerCase())
+340:         }
+341:         return false
+342:       }).reduce((sum, cg) => sum + (cg.total || 0), 0)
+343:       
+344:       totalBruto += extra;
+345: 
+346:       return { ...card, nombre: displayName, totalBruto }
+347:     })
+348:   }, [cards, initialGastos, obras, contratistaGastos])
+349: 
+350:   // All valid cards to display on main dashboard
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:22:18Z
+Completed At: 2026-07-24T22:22:19Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 959
+Total Bytes: 36248
+Showing lines 350 to 400
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+350:   // All valid cards to display on main dashboard
+351:   const activeCardsData = useMemo(() => {
+352:     const normals = allObrasCardsData.filter(card => {
+353:       const state = cards.find(c => c.type === "normal" && c.id === card.id)
+354:       return state ? state.isEnabled !== false : true
+355:     })
+356:     const customs = customCardsData.filter(c => c.isEnabled !== false)
+357:     return [...normals, ...customs]
+358:   }, [allObrasCardsData, customCardsData, cards])
+359: 
+360:   const columns: ColumnDef<GastoItem>[] = useMemo(() => [
+361:     {
+362:       id: "fecha",
+363:       sortKey: "fecha",
+364:       label: "Fecha",
+365:       render: (row) => (
+366:         <td key="fecha" className="w-[5%] px-2 py-3 font-mono text-[10px] text-foreground truncate" title={row.fechaFormatted}>
+367:           {row.fechaFormatted}
+368:         </td>
+369:       ),
+370:     },
+371:     {
+372:       id: "obraNombre",
+373:       sortKey: "obraNombre",
+374:       label: "Obra",
+375:       render: (row) => (
+376:         <td key="obraNombre" className="w-[6%] px-2 py-3 font-medium text-[10px] text-foreground truncate" title={row.obraNombre}>
+377:           {row.obraNombre}
+378:         </td>
+379:       ),
+380:     },
+381:     {
+382:       id: "proveedor",
+383:       sortKey: "proveedor",
+384:       label: "Proveedor",
+385:       render: (row) => (
+386:         <td key="proveedor" className="w-[10%] px-2 py-3 text-[10px] text-foreground truncate" title={row.proveedor || ""}>
+387:           {row.proveedor || "-"}
+388:         </td>
+389:       ),
+390:     },
+391:     {
+392:       id: "notas",
+393:       label: "Notas",
+394:       render: (row) => (
+395:         <td key="notas" className="w-[7%] px-2 py-3 text-[10px] text-muted-foreground truncate" title={row.notaCapturista || ""}>
+396:           {row.notaCapturista || "-"}
+397:         </td>
+398:       ),
+399:     },
+400:     {
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:22:25Z
+Completed At: 2026-07-24T22:22:25Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 959
+Total Bytes: 36248
+Showing lines 550 to 600
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+550:     {
+551:       id: "capturista",
+552:       label: "Capturista",
+553:       render: (row) => (
+554:         <td key="capturista" className="w-[6%] px-2 py-3 text-[10px] text-muted-foreground truncate" title={row.creadoPorNombre}>
+555:           <span className="text-[10px] font-medium text-foreground/80">
+556:             {row.creadoPorNombre}
+557:           </span>
+558:         </td>
+559:       ),
+560:     }
+561:   ], []);
+562: 
+563:   return (
+564:     <div className="space-y-4 pb-6">
+565:       {/* Top Header Row */}
+566:       <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+567:         <div className="flex flex-col gap-1">
+568:           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
+569:             Registro de Gastos
+570:           </h1>
+571:         </div>
+572:         <div className="flex items-center gap-3">
+573:           <a href="/admin/gastos">
+574:             <Button variant="secondary" className="rounded-xl px-6 shadow-sm border border-border/50 bg-muted/30">
+575:               Gastos Generales
+576:             </Button>
+577:           </a>
+578:         </div>
+579:       </div>
+580: 
+581:       {/* Cards Section */}
+582:       {activeCardsData.length > 0 && (
+583:         <div className="flex flex-wrap justify-center gap-4 mt-2">
+584:           {activeCardsData.map(card => (
+585:             <div key={card.id} className="w-[240px]">
+586:               <ObraSummaryCard
+587:                 nombre={card.nombre}
+588:                 totalBruto={card.totalBruto}
+589:                 isActive={true}
+590:                 onClick={() => {
+591:                   setCardToDisable({ id: card.id, nombre: card.nombre, type: card.type as "normal" | "custom" })
+592:                   setIsCardDisableDialogOpen(true)
+593:                 }}
+594:               />
+595:             </div>
+596:           ))}
+597:         </div>
+598:       )}
+599: 
+600:       {/* Action Bar (Search, Filtros, Columnas) */}
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:22:36Z
+Completed At: 2026-07-24T22:22:36Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 959
+Total Bytes: 36248
+Showing lines 100 to 150
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+100:   
+101:   // Normalize initial cards (backwards compatibility for old string[] saves)
+102:   const normalizedCards = useMemo<CardConfig[]>(() => {
+103:     return initialCards.map(c => {
+104:       if (typeof c === "string") {
+105:         return { id: c, type: "normal", obraId: c, isEnabled: true }
+106:       }
+107:       return c as CardConfig
+108:     })
+109:   }, [initialCards])
+110: 
+111:   const [cards, setCards] = useState<CardConfig[]>(normalizedCards)
+112:   const [isCardsDialogOpen, setIsCardsDialogOpen] = useState(false)
+113: 
+114:   // Sort states from URL
+115:   const searchParams = useSearchParams()
+116:   const sortField = (searchParams.get("sortBy") as keyof GastoItem) || "fecha"
+117:   const sortDirection = (searchParams.get("sortOrder") as "asc" | "desc") || "desc"
+118: 
+119:   // Visible columns state
+120:   const [visibleColumns, setVisibleColumns] = useState<string[]>([
+121:     "fecha",
+122:     "obraNombre",
+123:     "proveedor",
+124:     "notas",
+125:     "unidad",
+126:     "concepto",
+127:     "subtotal",
+128:     "subtotal8",
+129:     "subtotal16",
+130:     "subtotal0",
+131:     "iva",
+132:     "iva8",
+133:     "iva16",
+134:     "ieps",
+135:     "descuento",
+136:     "ivaRetenido",
+137:     "isrRetenido",
+138:     "total"
+139:   ])
+140: 
+141:   // Form states
+142:   const [isPending, startTransition] = useTransition()
+143:   const [obraId, setObraId] = useState<string>("")
+144:   const [customObras, setCustomObras] = useState<string[]>([])
+145:   
+146:   // Extract unique proveedores from initialGastos
+147:   const uniqueContratistas = useMemo(() => {
+148:     const conts = initialGastos.map(g => g.contratista).filter(Boolean)
+149:     return Array.from(new Set(conts)).sort((a, b) => a.localeCompare(b))
+150:   }, [initialGastos])
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:24:37Z
+Completed At: 2026-07-24T22:24:37Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 818
+Total Bytes: 32176
+Showing lines 100 to 140
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+100:   
+101:   // Normalize initial cards (backwards compatibility for old string[] saves)
+102:   const normalizedCards = useMemo<CardConfig[]>(() => {
+103:     return initialCards.map(c => {
+104:       if (typeof c === "string") {
+105:         return { id: c, type: "normal", obraId: c, isEnabled: true }
+106:       }
+107:       return c as CardConfig
+108:     })
+109:   }, [initialCards])
+110: 
+111:   const [cards, setCards] = useState<CardConfig[]>(normalizedCards)
+112:   const [isCardsDialogOpen, setIsCardsDialogOpen] = useState(false)
+113: 
+114:   // Sort states from URL
+115:   const searchParams = useSearchParams()
+116:   const sortField = (searchParams.get("sortBy") as keyof GastoItem) || "fecha"
+117:   const sortDirection = (searchParams.get("sortOrder") as "asc" | "desc") || "desc"
+118: 
+119:   // Visible columns state
+120:   const [visibleColumns, setVisibleColumns] = useState<string[]>([
+121:     "fecha",
+122:     "obraNombre",
+123:     "periodo",
+124:     "trabajoRealizado",
+125:     "contratista",
+126:     "total",
+127:     "capturista"
+128:   ])
+129: 
+130:   // Form states
+131:   const [isPending, startTransition] = useTransition()
+132:   const [obraId, setObraId] = useState<string>("")
+133:   const [customObras, setCustomObras] = useState<string[]>([])
+134:   
+135:   // Extract unique proveedores from initialGastos
+136:   const uniqueContratistas = useMemo(() => {
+137:     const conts = initialGastos.map(g => g.contratista).filter(Boolean)
+138:     return Array.from(new Set(conts)).sort((a, b) => a.localeCompare(b))
+139:   }, [initialGastos])
+140: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:24:42Z
+Completed At: 2026-07-24T22:24:43Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 818
+Total Bytes: 32176
+Showing lines 60 to 100
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+60: 
+61: export interface ObraOption {
+62:   id: string
+63:   nombre: string
+64: }
+65: 
+66: export interface CardConfig {
+67:   id: string
+68:   type: "normal" | "custom"
+69:   obraId: string
+70:   keyword?: string
+71:   titulo?: string
+72:   isEnabled?: boolean
+73: }
+74: 
+75: interface ContratistasSpreadsheetClientProps {
+76:   initialGastos: ContratistaGastoItem[]
+77:   obras: ObraOption[]
+78:   availableYears: number[]
+79:   initialCards?: any[]
+80:   contratistaGastos?: { obraNombre: string; total: number; trabajoRealizado: string | null }[]
+81: }
+82: 
+83: const MONTH_NAMES = [
+84:   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+85:   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+86: ]
+87: 
+88: export default function ContratistasSpreadsheetClient({
+89:   initialGastos,
+90:   obras,
+91:   availableYears,
+92:   initialCards = [],
+93:   contratistaGastos = [],
+94: }: ContratistasSpreadsheetClientProps) {
+95:   // Filter states
+96:   const [selectedYear, setSelectedYear] = useState<string>("all")
+97:   const [selectedMonth, setSelectedMonth] = useState<string>("all")
+98:   const [selectedObra, setSelectedObra] = useState<string>("all")
+99:   const [searchTerm, setSearchTerm] = useState<string>("")
+100:   
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+
+Created At: 2026-07-24T22:25:18Z
+Completed At: 2026-07-24T22:25:18Z
+File Path: `file:///d:/SPEND/CONTROL2-1/app/admin/contratistas/ContratistasSpreadsheetClient.tsx`
+Total Lines: 818
+Total Bytes: 32187
+Showing lines 40 to 80
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+40: import { CardsCrudDialog } from "./CardsCrudDialog"
+41: import { EditContratistaDialog } from "./EditContratistaDialog"
+42: 
+43: export interface ContratistaGastoItem {
+44:   id: string
+45:   fecha: string
+46:   fechaStr: string
+47:   fechaFormatted?: string
+48:   year: number
+49:   obraNombre: string
+50:   periodo: string | null
+51:   trabajoRealizado: string | null
+52:   contratista: string
+53:   total: number
+54:   creadoPorId: string
+55:   creadoPorNombre: string
+56:   createdAt: any
+57:   updatedAt: any
+58:   isDeleted: boolean
+59: }
+60: 
+61: export interface ObraOption {
+62:   id: string
+63:   nombre: string
+64: }
+65: 
+66: export interface CardConfig {
+67:   id: string
+68:   type: "normal" | "custom"
+69:   obraId: string
+70:   keyword?: string
+71:   titulo?: string
+72:   isEnabled?: boolean
+73: }
+74: 
+75: interface ContratistasSpreadsheetClientProps {
+76:   initialGastos: ContratistaGastoItem[]
+77:   obras: ObraOption[]
+78:   availableYears: number[]
+79:   initialCards?: any[]
+80:   contratistaGastos?: { obraNombre: string; total: number; trabajoRealizado: string | null }[]
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+====================
+

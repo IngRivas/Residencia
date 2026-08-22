@@ -1,0 +1,16 @@
+model User {
+  id       String @id @default(cuid())
+  name     String
+  email    String @unique
+  password String
+
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  obraRoles ObraUser[]
+  gastos    Gasto[]
+  obras     Obra[]
+  textZoom  Int           @default(0)
+  logs      ActivityLog[]
+  createdAt DateTime      @default(now())
+}

@@ -1,0 +1,78 @@
+model SpreadsheetGasto {
+  id              String   @id @default(cuid()) // Can store "csv-123" or "manual-123"
+  fecha           String   // Stored as ISO string "YYYY-MM-DD"
+  fechaFormatted  String
+  year            Int
+  month           Int
+  obraId          String
+  obraNombre      String
+  proveedor       String
+  concepto        String
+  categoria       String?
+  subtotal        Decimal
+  subtotal16      Decimal?
+  subtotal8       Decimal?
+  subtotal0       Decimal?
+  porcentajeIVA   Decimal
+  iva             Decimal
+  iva16           Decimal?
+  iva8            Decimal?
+  ieps            Decimal?
+  descuento       Decimal?
+  ivaRetenido     Decimal?
+  isrRetenido     Decimal?
+  total           Decimal
+  notaCapturista  String?
+  creadoPorNombre String
+  estado          String
+  isDeleted       Boolean  @default(false)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model SpreadsheetCardConfig {
+  id          String   @id
+  type        String   // "normal" or "custom"
+  obraId      String
+  keyword     String?
+  titulo      String?
+  fechaInicio String?
+  fechaFin    String?
+  isEnabled   Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContratistaGasto {
+  id               String   @id
+  fecha            DateTime
+  fechaStr         String
+  obraNombre       String
+  periodo          String?
+  trabajoRealizado String?
+  notas            String?
+  contratista      String
+  total            Float
+  creadoPorId      String   @default("system")
+  creadoPorNombre  String   @default("Sistema")
+  isDeleted        Boolean  @default(false)
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model ContratistaCardConfig {
+  id          String   @id
+  type        String   // "normal" or "custom"
+  obraId      String
+  keyword     String?
+  titulo      String?
+  fechaInicio String?
+  fechaFin    String?
+  isEnabled   Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

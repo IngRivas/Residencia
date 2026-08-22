@@ -1,0 +1,559 @@
+{
+  "timestamp": "2026-07-23T19:49:32.445Z",
+  "roles": [
+    {
+      "id": "cmpr7qr960000pkv92sxx5g3i",
+      "name": "SUPER_ADMIN",
+      "permissions": [
+        "manage_roles",
+        "manage_users",
+        "manage_obras",
+        "manage_expenses",
+        "view_reports"
+      ],
+      "isSystem": true,
+      "schedules": [],
+      "createdAt": "2026-05-29T17:46:00.954Z",
+      "updatedAt": "2026-05-29T17:46:00.954Z"
+    },
+    {
+      "id": "cmpr7qra50001pkv97aou3rbt",
+      "name": "ADMIN",
+      "permissions": [
+        "manage_users",
+        "manage_obras",
+        "manage_expenses",
+        "view_reports"
+      ],
+      "isSystem": true,
+      "schedules": [],
+      "createdAt": "2026-05-29T17:46:00.989Z",
+      "updatedAt": "2026-05-29T17:46:00.989Z"
+    },
+    {
+      "id": "cmpr7qras0003pkv94l0pak8z",
+      "name": "VIEWER",
+      "permissions": [
+        "view_reports"
+      ],
+      "isSystem": true,
+      "schedules": [],
+      "createdAt": "2026-05-29T17:46:01.012Z",
+      "updatedAt": "2026-05-29T17:46:01.012Z"
+    },
+    {
+      "id": "cmpr7qrah0002pkv9vyr6o8r6",
+      "name": "CAPTURISTA",
+      "permissions": [
+        "manage_expenses",
+        "view_reports"
+      ],
+      "isSystem": true,
+      "schedules": [
+        {
+          "end": "17:00",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "start": "09:00"
+        },
+        {
+          "end": "14:00",
+          "days": [
+            0,
+            6
+          ],
+          "start": "09:00"
+        }
+      ],
+      "createdAt": "2026-05-29T17:46:01.001Z",
+      "updatedAt": "2026-07-13T15:39:54.932Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "cmq8bn4za0000dwv9u9yjuskg",
+      "name": "prueba",
+      "email": "prueba@mcacorporation.com",
+      "password": "$2b$10$nNP/AmOvJJjd3kKDGFTH0utp7n2kPylCVSKDYgdSOhKaB3OH7rTMC",
+      "roleId": "cmpr7qrah0002pkv9vyr6o8r6",
+      "textZoom": -1,
+      "createdAt": "2026-06-10T17:07:15.574Z"
+    },
+    {
+      "id": "cmqbd9x4r000i0lmnl4a88giz",
+      "name": "Erika",
+      "email": "ereyes@mcacorporation.com",
+      "password": "$2b$10$tEVhGEebmQduXF6MhP4UWuJLJqJEx0878a72NCUE582o20Q9dZUKq",
+      "roleId": "cmpr7qrah0002pkv9vyr6o8r6",
+      "textZoom": 2,
+      "createdAt": "2026-06-12T20:16:16.635Z"
+    },
+    {
+      "id": "cmqk0vkuh000b0lqlajjybkix",
+      "name": "Carlos Cova",
+      "email": "c.cova@mcacorporation.com",
+      "password": "$2b$10$j9x9VR77lc5ginDxoUv/.OoxRZnn0VJrYLwufs42hz0hcgUrum9G.",
+      "roleId": "cmpr7qrah0002pkv9vyr6o8r6",
+      "textZoom": 0,
+      "createdAt": "2026-06-18T21:39:07.721Z"
+    },
+    {
+      "id": "cmpr912ja0001xov9x9yr0cep",
+      "name": "Alan Gracia",
+      "email": "agracia@mcacorporation.com",
+      "password": "$2b$10$eWYo.6kZbLzvynhsWd3cru60mz.g/X9RyWTl5qYBmVXpordLGIdBa",
+      "roleId": "cmpr7qra50001pkv97aou3rbt",
+      "textZoom": 0,
+      "createdAt": "2026-05-29T18:22:01.750Z"
+    },
+    {
+      "id": "cmqk13821000h0lqlvviueryh",
+      "name": "Ismael Aboyte",
+      "email": "i.aboyte@mcacorporation.com",
+      "password": "$2b$10$2PY2HT6mjVCEh6MGSzYFFOjpAMmXJY.PFFxFxJ2XTjpC3z2r0UPN2",
+      "roleId": "cmpr7qrah0002pkv9vyr6o8r6",
+      "textZoom": 0,
+      "createdAt": "2026-06-18T21:45:04.393Z"
+    },
+    {
+      "id": "cmqk1ewlr000l0lqle2d2ejun",
+      "name": "Valery Cantillo",
+      "email": "v.cantillo@mcacorporation.com",
+      "password": "$2b$10$C5WXGv4XoRe55HsMsxNJwuLAeLNZv8DdQnE1ZGw9.b8JQ3EdyGseu",
+      "roleId": "cmpr7qrah0002pkv9vyr6o8r6",
+      "textZoom": 0,
+      "createdAt": "2026-06-18T21:54:09.423Z"
+    },
+    {
+      "id": "cmpr8y2nc0000xov9daydbvqa",
+      "name": "Aida Campoy",
+      "email": "acampoy@mcacorporation.com",
+      "password": "$2b$10$0r2CeTjxSCHY/3o2AjkpOOBkbYAmMX4G4tuSEvVHArNtPhlvFlt/G",
+      "roleId": "cmpr7qra50001pkv97aou3rbt",
+      "textZoom": 1,
+      "createdAt": "2026-05-29T18:19:41.928Z"
+    },
+    {
+      "id": "cmq6xtop50001cwv9w3rns31q",
+      "name": "Edwin Coronel",
+      "email": "ecoronel@mcacorporation.com",
+      "password": "$2b$10$iwERQ.2JqWPnNH3En7nZo.t65ZZIdkTYX4GKEt30ZSzqEksZOlqdK",
+      "roleId": "cmpr7qras0003pkv94l0pak8z",
+      "textZoom": -1,
+      "createdAt": "2026-06-09T17:52:40.265Z"
+    },
+    {
+      "id": "cmpr8f8gs0001nwv92e2yum0a",
+      "name": "Julio Exzacarias",
+      "email": "jdeharo@mcacorporation.com",
+      "password": "$2b$10$mL2SodslqBI4IDjPSVu7QOGDQBL/C5lyP2TCyO3zRA8roofCoFOi.",
+      "roleId": "cmpr7qr960000pkv92sxx5g3i",
+      "textZoom": -1,
+      "createdAt": "2026-05-29T18:05:03.004Z"
+    },
+    {
+      "id": "cmqk110u4000f0lqlm0p57gep",
+      "name": "Raymundo Rodriguez",
+      "email": "r.rodriguez@mcacorporation.com",
+      "password": "$2b$10$4rVEB.Kp77MOI3HJ3WClcezKDpqO1lQZXpWdaKTKPaKUIlQjvo0x2",
+      "roleId": "cmpr7qrah0002pkv9vyr6o8r6",
+      "textZoom": 1,
+      "createdAt": "2026-06-18T21:43:21.724Z"
+    },
+    {
+      "id": "cmqk0xz7m000d0lqlqqzjbuhl",
+      "name": "Jose Arguelles",
+      "email": "j.arguelles@mcacorporation.com",
+      "password": "$2b$10$Lj4Z9Cssl66F6PT.jZ7Sjeo.lZRovPH9slEIoODD6bByAwWh7gNzm",
+      "roleId": "cmpr7qrah0002pkv9vyr6o8r6",
+      "textZoom": 0,
+      "createdAt": "2026-06-18T21:40:59.650Z"
+    },
+    {
+      "id": "cmqk18amn000j0lqlvqg4m5b9",
+      "name": "Martin Gonzalez",
+      "email": "m.gonzalez@mcacorporation.com",
+      "password": "$2b$10$.MoXGMmZPvB5GrvZHQs6xepgmYvBXmonDBIff3JDIFEgBZiPi/nau",
+      "roleId": "cmpr7qrah0002pkv9vyr6o8r6",
+      "textZoom": 2,
+      "createdAt": "2026-06-18T21:49:01.008Z"
+    }
+  ],
+  "obras": [
+    {
+      "id": "cmr587we0000wm4v9ttuhf2op",
+      "nombre": "PRUEBA",
+      "presupuestoTotal": "0",
+      "estado": "ACTIVA",
+      "creadoPorId": "cmpr8f8gs0001nwv92e2yum0a",
+      "createdAt": "2026-07-03T17:47:49.560Z",
+      "updatedAt": "2026-07-13T02:36:59.513Z",
+      "deletedAt": null
+    },
+    {
+      "id": "cmqbcgju5000a0lmnjt5afgsu",
+      "nombre": "MERCADO DE ABASTOS",
+      "presupuestoTotal": "0",
+      "estado": "ACTIVA",
+      "creadoPorId": "cmpr8y2nc0000xov9daydbvqa",
+      "createdAt": "2026-06-12T19:53:26.381Z",
+      "updatedAt": "2026-06-12T19:53:26.381Z",
+      "deletedAt": null
+    },
+    {
+      "id": "cmql643ci00000llryc5d5np4",
+      "nombre": "CATEDRAL",
+      "presupuestoTotal": "0",
+      "estado": "ACTIVA",
+      "creadoPorId": "cmpr912ja0001xov9x9yr0cep",
+      "createdAt": "2026-06-19T16:53:29.203Z",
+      "updatedAt": "2026-06-19T16:53:29.203Z",
+      "deletedAt": null
+    },
+    {
+      "id": "cmql64qvu00040llrd4x1wpyn",
+      "nombre": "MERCADO DE ABASTOS PILAS",
+      "presupuestoTotal": "0",
+      "estado": "ACTIVA",
+      "creadoPorId": "cmpr912ja0001xov9x9yr0cep",
+      "createdAt": "2026-06-19T16:53:59.706Z",
+      "updatedAt": "2026-06-19T16:53:59.706Z",
+      "deletedAt": null
+    },
+    {
+      "id": "cmql7bk9c000f0llrod0yr9ri",
+      "nombre": "CIPLASTIC ROSARITO",
+      "presupuestoTotal": "0",
+      "estado": "ACTIVA",
+      "creadoPorId": "cmpr912ja0001xov9x9yr0cep",
+      "createdAt": "2026-06-19T17:27:17.328Z",
+      "updatedAt": "2026-06-19T17:27:17.328Z",
+      "deletedAt": null
+    },
+    {
+      "id": "cmql7cu9g000n0llrn6i68st0",
+      "nombre": "BODEGAS OCHOA",
+      "presupuestoTotal": "0",
+      "estado": "ACTIVA",
+      "creadoPorId": "cmpr912ja0001xov9x9yr0cep",
+      "createdAt": "2026-06-19T17:28:16.948Z",
+      "updatedAt": "2026-06-19T17:28:16.948Z",
+      "deletedAt": null
+    }
+  ],
+  "obraUsers": [
+    {
+      "id": "cmr5jhw2z00000lno42dwvc7n",
+      "obraId": "cmr587we0000wm4v9ttuhf2op",
+      "userId": "cmq8bn4za0000dwv9u9yjuskg",
+      "rol": "CAPTURISTA"
+    },
+    {
+      "id": "cmqbcgjun000b0lmnjal6hopn",
+      "obraId": "cmqbcgju5000a0lmnjt5afgsu",
+      "userId": "cmpr8y2nc0000xov9daydbvqa",
+      "rol": "ADMIN"
+    },
+    {
+      "id": "cmqbdakil000k0lmn53yyd7ah",
+      "obraId": "cmqbcgju5000a0lmnjt5afgsu",
+      "userId": "cmqbd9x4r000i0lmnl4a88giz",
+      "rol": "CAPTURISTA"
+    },
+    {
+      "id": "cmql643d600010llrhyjxzskw",
+      "obraId": "cmql643ci00000llryc5d5np4",
+      "userId": "cmpr912ja0001xov9x9yr0cep",
+      "rol": "ADMIN"
+    },
+    {
+      "id": "cmql643d600020llr81oj4oaw",
+      "obraId": "cmql643ci00000llryc5d5np4",
+      "userId": "cmpr8y2nc0000xov9daydbvqa",
+      "rol": "ADMIN"
+    },
+    {
+      "id": "cmql64qxi00050llr1g0b0ucx",
+      "obraId": "cmql64qvu00040llrd4x1wpyn",
+      "userId": "cmpr8y2nc0000xov9daydbvqa",
+      "rol": "ADMIN"
+    },
+    {
+      "id": "cmql64qxi00060llr1euxk51j",
+      "obraId": "cmql64qvu00040llrd4x1wpyn",
+      "userId": "cmpr912ja0001xov9x9yr0cep",
+      "rol": "ADMIN"
+    },
+    {
+      "id": "cmql7blna000g0llrd4c1mnbz",
+      "obraId": "cmql7bk9c000f0llrod0yr9ri",
+      "userId": "cmpr8y2nc0000xov9daydbvqa",
+      "rol": "ADMIN"
+    },
+    {
+      "id": "cmql7blnb000h0llreeftmpkw",
+      "obraId": "cmql7bk9c000f0llrod0yr9ri",
+      "userId": "cmpr912ja0001xov9x9yr0cep",
+      "rol": "ADMIN"
+    },
+    {
+      "id": "cmql7c5d0000j0llryam26gmz",
+      "obraId": "cmqbcgju5000a0lmnjt5afgsu",
+      "userId": "cmpr912ja0001xov9x9yr0cep",
+      "rol": "ADMIN"
+    },
+    {
+      "id": "cmql7cubh000p0llrmkj13cn7",
+      "obraId": "cmql7cu9g000n0llrn6i68st0",
+      "userId": "cmpr912ja0001xov9x9yr0cep",
+      "rol": "ADMIN"
+    },
+    {
+      "id": "cmql7cubh000o0llrt2sgeb20",
+      "obraId": "cmql7cu9g000n0llrn6i68st0",
+      "userId": "cmpr8y2nc0000xov9daydbvqa",
+      "rol": "ADMIN"
+    },
+    {
+      "id": "cmql7eavj000r0llre6aqnv9g",
+      "obraId": "cmql7cu9g000n0llrn6i68st0",
+      "userId": "cmqk18amn000j0lqlvqg4m5b9",
+      "rol": "CAPTURISTA"
+    },
+    {
+      "id": "cmql7ewbl000t0llryehdh9a1",
+      "obraId": "cmql7bk9c000f0llrod0yr9ri",
+      "userId": "cmqk0xz7m000d0lqlqqzjbuhl",
+      "rol": "CAPTURISTA"
+    },
+    {
+      "id": "cmql7faf9000v0llrh60bvmi5",
+      "obraId": "cmql64qvu00040llrd4x1wpyn",
+      "userId": "cmqk110u4000f0lqlm0p57gep",
+      "rol": "CAPTURISTA"
+    },
+    {
+      "id": "cmql7fm07000x0llrcoia4cj7",
+      "obraId": "cmql643ci00000llryc5d5np4",
+      "userId": "cmqk0vkuh000b0lqlajjybkix",
+      "rol": "CAPTURISTA"
+    },
+    {
+      "id": "cmql7fy06000z0llr8a5av90q",
+      "obraId": "cmqbcgju5000a0lmnjt5afgsu",
+      "userId": "cmqk13821000h0lqlvviueryh",
+      "rol": "CAPTURISTA"
+    },
+    {
+      "id": "cmql7fzrg00110llrxqnjollh",
+      "obraId": "cmqbcgju5000a0lmnjt5afgsu",
+      "userId": "cmqk1ewlr000l0lqle2d2ejun",
+      "rol": "CAPTURISTA"
+    },
+    {
+      "id": "cmr587wee000xm4v9q7zxmbl2",
+      "obraId": "cmr587we0000wm4v9ttuhf2op",
+      "userId": "cmpr912ja0001xov9x9yr0cep",
+      "rol": "ADMIN"
+    }
+  ],
+  "proveedores": [
+    {
+      "id": "cmqbcikca000f0lmnxj8mfsnf",
+      "nombre": "RETIRO DE ESCOMBRO",
+      "rfc": null,
+      "createdAt": "2026-06-12T19:55:00.346Z",
+      "updatedAt": "2026-06-12T19:55:00.346Z"
+    },
+    {
+      "id": "cmql9e5dk000b0lmdm5pb1qtj",
+      "nombre": "RETIRO DE LODO",
+      "rfc": null,
+      "createdAt": "2026-06-19T18:25:17.240Z",
+      "updatedAt": "2026-06-19T18:25:17.240Z"
+    },
+    {
+      "id": "cmql9gcwt000e0lmdo1xnf516",
+      "nombre": "BAJA PAINT",
+      "rfc": "BPA010206MSA",
+      "createdAt": "2026-06-19T18:27:00.317Z",
+      "updatedAt": "2026-06-19T21:40:19.151Z"
+    },
+    {
+      "id": "cmqbdto2x00100lmnvxeru97h",
+      "nombre": "ESTACIÓN EL NARANJO",
+      "rfc": "ENA9603207K1",
+      "createdAt": "2026-06-12T20:31:38.025Z",
+      "updatedAt": "2026-06-19T21:40:50.086Z"
+    },
+    {
+      "id": "cmql9dkvo00080lmdrjt1jppd",
+      "nombre": "ESTACION GRUGAS",
+      "rfc": "EGR061024JP3",
+      "createdAt": "2026-06-19T18:24:50.676Z",
+      "updatedAt": "2026-06-19T21:41:10.715Z"
+    },
+    {
+      "id": "cmql9dap300070lmdbebvillv",
+      "nombre": "ESTACION LA VICTORIA",
+      "rfc": "EVI0802115Y2",
+      "createdAt": "2026-06-19T18:24:37.479Z",
+      "updatedAt": "2026-06-19T21:41:22.572Z"
+    },
+    {
+      "id": "cmqbdoiut000t0lmnwikqbwpt",
+      "nombre": "ESTACIÓN PIRU",
+      "rfc": "EPI0103167Z2",
+      "createdAt": "2026-06-12T20:27:37.973Z",
+      "updatedAt": "2026-06-19T21:41:54.693Z"
+    },
+    {
+      "id": "cmql9dqgx00090lmdxvsnra5f",
+      "nombre": "ESTACION RAEL",
+      "rfc": "ERA061011HQ6",
+      "createdAt": "2026-06-19T18:24:57.921Z",
+      "updatedAt": "2026-06-19T21:42:03.309Z"
+    },
+    {
+      "id": "cmql9dvic000a0lmdwibje27o",
+      "nombre": "HOME DEPOT",
+      "rfc": "HDM001017AS1",
+      "createdAt": "2026-06-19T18:25:04.452Z",
+      "updatedAt": "2026-06-19T21:42:10.751Z"
+    },
+    {
+      "id": "cmql9fzkh000c0lmdy5kau4rc",
+      "nombre": "MADERAS Y FERRETERIAS DURAN",
+      "rfc": "MFD000320PB9",
+      "createdAt": "2026-06-19T18:26:43.025Z",
+      "updatedAt": "2026-06-19T21:42:29.818Z"
+    },
+    {
+      "id": "cmql9kft4000g0lmdkdh68b2q",
+      "nombre": "MATERIALES ENSENADA",
+      "rfc": "MEN950221647",
+      "createdAt": "2026-06-19T18:30:10.696Z",
+      "updatedAt": "2026-06-19T21:42:40.720Z"
+    },
+    {
+      "id": "cmqbdsmrh000x0lmn6ieln37c",
+      "nombre": "CEMEX",
+      "rfc": "PMM700717QW0",
+      "createdAt": "2026-06-12T20:30:49.661Z",
+      "updatedAt": "2026-06-19T21:43:08.473Z"
+    },
+    {
+      "id": "cmql9i0kq000f0lmd6m6jghxy",
+      "nombre": "OFFICE DEPOT",
+      "rfc": "ODM950324V2A",
+      "createdAt": "2026-06-19T18:28:17.642Z",
+      "updatedAt": "2026-06-19T21:43:24.393Z"
+    },
+    {
+      "id": "cmqlbep1700020lmn69zmj7uz",
+      "nombre": "SERVICIO CIBOLA",
+      "rfc": "SCI090430KU1",
+      "createdAt": "2026-06-19T19:21:41.947Z",
+      "updatedAt": "2026-06-19T21:43:37.039Z"
+    },
+    {
+      "id": "cmqlb9loi00000lmna7197bh2",
+      "nombre": "SERVICIO EFIGAS",
+      "rfc": "SEF100902MJ1",
+      "createdAt": "2026-06-19T19:17:44.323Z",
+      "updatedAt": "2026-06-19T21:43:45.709Z"
+    },
+    {
+      "id": "cmql9g4bz000d0lmdny1gsz5u",
+      "nombre": "TRP SUPER TIENDAS",
+      "rfc": "TSU110704448",
+      "createdAt": "2026-06-19T18:26:49.199Z",
+      "updatedAt": "2026-06-19T21:43:55.248Z"
+    },
+    {
+      "id": "cmqlghzod00070lrrfsfxepnp",
+      "nombre": "MRO STORE",
+      "rfc": "MST231011PG8",
+      "createdAt": "2026-06-19T21:44:13.790Z",
+      "updatedAt": "2026-06-19T21:44:13.790Z"
+    },
+    {
+      "id": "cmqlgjl6w00080lrrmj2sa9gt",
+      "nombre": "AUTOZONE",
+      "rfc": "AME970109GW0",
+      "createdAt": "2026-06-19T21:45:28.328Z",
+      "updatedAt": "2026-06-19T21:45:28.328Z"
+    },
+    {
+      "id": "cmqlgk3tm00090lrr20mrko26",
+      "nombre": "COMERCIAL SONORA",
+      "rfc": "CSB980423JC5",
+      "createdAt": "2026-06-19T21:45:52.474Z",
+      "updatedAt": "2026-06-19T21:45:52.474Z"
+    },
+    {
+      "id": "cmqlirhx2000a0lrr43m4u1ux",
+      "nombre": "COMERCIAL DE EMPAQUES PLASTICOS",
+      "rfc": "CEP000621264",
+      "createdAt": "2026-06-19T22:47:36.566Z",
+      "updatedAt": "2026-06-19T22:47:36.566Z"
+    },
+    {
+      "id": "cmqlisodn000b0lrrz5h9y9zb",
+      "nombre": "LAURA CELINA RUBIO LOPEZ",
+      "rfc": "RULL7011155Y1",
+      "createdAt": "2026-06-19T22:48:31.595Z",
+      "updatedAt": "2026-06-19T22:48:31.595Z"
+    },
+    {
+      "id": "cmqlisvk9000c0lrrfrlemcx6",
+      "nombre": "LUIS BERENGUER IBARRONDO",
+      "rfc": "BEIL601012MMA",
+      "createdAt": "2026-06-19T22:48:40.905Z",
+      "updatedAt": "2026-06-19T22:48:40.905Z"
+    },
+    {
+      "id": "cmr11c1dl00130lo34evpfytr",
+      "nombre": "JL CONCRETOS",
+      "rfc": null,
+      "createdAt": "2026-06-30T19:24:00.633Z",
+      "updatedAt": "2026-06-30T19:24:00.633Z"
+    }
+  ],
+  "diasObra": [
+    {
+      "id": "cmr9fb0pi00010lrv89ice6ke",
+      "obraId": "cmql643ci00000llryc5d5np4",
+      "fecha": "2026-07-06T00:00:00.000Z",
+      "presupuestoDiario": "3300",
+      "reposicion": "0",
+      "createdAt": "2026-07-06T16:17:17.142Z",
+      "deletedAt": null
+    },
+    {
+      "id": "cmr9fbea000030lrvu5zlqyid",
+      "obraId": "cmqbcgju5000a0lmnjt5afgsu",
+      "fecha": "2026-07-06T00:00:00.000Z",
+      "presupuestoDiario": "9500",
+      "reposicion": "0",
+      "createdAt": "2026-07-06T16:17:34.728Z",
+      "deletedAt": null
+    },
+    {
+      "id": "cmr9fbqn400050lrvhq6ts0wl",
+      "obraId": "cmql64qvu00040llrd4x1wpyn",
+      "fecha": "2026-07-06T00:00:00.000Z",
+      "presupuestoDiario": "2600",
+      "reposicion": "0",
+      "createdAt": "2026-07-06T16:17:50.752Z",
+      "deletedAt": null
+    }
+  ],
+  "gastos": [],
+  "fotos": []
+}

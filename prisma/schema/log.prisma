@@ -1,0 +1,10 @@
+model ActivityLog {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action     String // ej. "CREAR", "ELIMINAR", "VERIFICAR"
+  entityType String // ej. "Obra", "DiaObra", "Gasto", "Miembro"
+  entityId   String
+  details    String? // Detalles legibles para el frontend
+  createdAt  DateTime @default(now())
+}

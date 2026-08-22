@@ -1,0 +1,7 @@
+model Proveedor {
+  id        String    @id @default(cuid())
+  nombre    String    @unique
+  rfc       String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}

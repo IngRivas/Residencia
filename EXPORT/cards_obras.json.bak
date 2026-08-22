@@ -1,0 +1,34 @@
+[
+  {
+    "id": "abastos",
+    "type": "normal",
+    "obraId": "abastos",
+    "isEnabled": true
+  },
+  {
+    "id": "big machines",
+    "type": "normal",
+    "obraId": "big machines",
+    "isEnabled": true
+  },
+  {
+    "id": "bobcat",
+    "type": "normal",
+    "obraId": "bobcat",
+    "isEnabled": true
+  },
+  {
+    "id": "ciplastic",
+    "type": "normal",
+    "obraId": "ciplastic",
+    "isEnabled": true
+  },
+  {
+    "id": "custom-1784920930322",
+    "type": "custom",
+    "obraId": "abastos",
+    "keyword": "PILAS",
+    "titulo": "ABASTOS PILAS",
+    "isEnabled": true
+  }
+]
