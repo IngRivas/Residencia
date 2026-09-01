@@ -79,7 +79,7 @@ Debes responder ÚNICAMENTE con un JSON válido, sin Markdown (\`\`\`json) y sin
   // 3. Llamar a Gemini 1.5 Pro
   try {
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-3.6-flash",
+      model: "gemini-1.5-pro",
       generationConfig: {
         responseMimeType: "application/json",
       }

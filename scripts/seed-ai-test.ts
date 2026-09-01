@@ -14,8 +14,7 @@ async function main() {
       obra = await prisma.obra.create({
           data: {
               nombre: "Obra de Prueba IA",
-              ubicacion: "Test",
-              cliente: "Test"
+              presupuestoTotal: 100000
           }
       })
   }
