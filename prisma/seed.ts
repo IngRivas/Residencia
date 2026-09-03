@@ -1,12 +1,11 @@
 import { PrismaClient, ObraRol, ObraEstado, GastoEstado } from "@prisma/client"
-import { PrismaPg } from "@prisma/adapter-pg"
-import { Pool } from "pg"
+
+import { PrismaLibSql } from "@prisma/adapter-libsql"
 import * as bcrypt from "bcryptjs"
 import "dotenv/config"
 
-const connectionString = process.env.DATABASE_URL
-const pool = new Pool({ connectionString })
-const adapter = new PrismaPg(pool)
+const connectionString = process.env.DATABASE_URL || "file:./dev.db"
+const adapter = new PrismaLibSql({ url: connectionString })
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
@@ -28,13 +27,13 @@ async function main() {
   const superAdminRole = await prisma.role.create({
     data: {
       name: "SUPER_ADMIN",
-      permissions: [
+      permissions: JSON.stringify([
         "manage_roles",
         "manage_users",
         "manage_obras",
         "manage_expenses",
         "view_reports",
-      ],
+      ]),
       isSystem: true,
     },
   })
@@ -42,12 +41,12 @@ async function main() {
   const adminRole = await prisma.role.create({
     data: {
       name: "ADMIN",
-      permissions: [
+      permissions: JSON.stringify([
         "manage_users",
         "manage_obras",
         "manage_expenses",
         "view_reports",
-      ],
+      ]),
       isSystem: true,
     },
   })
@@ -55,7 +54,7 @@ async function main() {
   const capturistaRole = await prisma.role.create({
     data: {
       name: "CAPTURISTA",
-      permissions: ["manage_expenses", "view_reports"],
+      permissions: JSON.stringify(["manage_expenses", "view_reports"]),
       isSystem: true,
     },
   })
@@ -63,7 +62,7 @@ async function main() {
   const viewerRole = await prisma.role.create({
     data: {
       name: "VIEWER",
-      permissions: ["view_reports"],
+      permissions: JSON.stringify(["view_reports"]),
       isSystem: true,
     },
   })
@@ -73,8 +72,8 @@ async function main() {
   // 2. Create Users
   const superadmin = await prisma.user.create({
     data: {
-      name: "Juan Pérez (Super Admin)",
-      email: "jdeharo@gmail.com",
+      name: "Julio Exzacarias",
+      email: "jrbdk147@gmail.com",
       password: passwordHash,
       roleId: superAdminRole.id,
     },
@@ -381,5 +380,4 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect()
-    await pool.end()
   })

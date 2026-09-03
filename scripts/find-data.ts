@@ -5,7 +5,7 @@ async function main() {
   
   const dias = await prisma.diaObra.findMany({
     where: {
-      obra: { nombre: { contains: "lomas", mode: "insensitive" } },
+      obra: { nombre: { contains: "lomas" } },
     }
   });
   console.log("Dias de obra en Lomas:", dias.map(d => ({ id: d.id, fecha: d.fecha })));

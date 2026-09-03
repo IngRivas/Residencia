@@ -25,11 +25,11 @@ export async function GET(request: Request) {
     const whereObra: any = { deletedAt: null }
     if (estadoMatch) {
       whereObra.OR = [
-        { nombre: { contains: query, mode: "insensitive" } },
+        { nombre: { contains: query } },
         { estado: estadoMatch },
       ]
     } else {
-      whereObra.nombre = { contains: query, mode: "insensitive" }
+      whereObra.nombre = { contains: query }
     }
 
     const obras = await prisma.obra.findMany({
@@ -45,9 +45,9 @@ export async function GET(request: Request) {
     const users = await prisma.user.findMany({
       where: {
         OR: [
-          { name: { contains: query, mode: "insensitive" } },
-          { email: { contains: query, mode: "insensitive" } },
-          { role: { name: { contains: query, mode: "insensitive" } } },
+          { name: { contains: query } },
+          { email: { contains: query } },
+          { role: { name: { contains: query } } },
         ],
       },
       select: {

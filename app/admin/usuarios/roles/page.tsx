@@ -73,9 +73,9 @@ export default async function RolesPage() {
                 {r.name.replace(/_/g, " ").toLowerCase()}
               </TableCell>
               <TableCell className="max-w-[350px]">
-                {r.permissions.length > 0 ? (
+                {JSON.parse(r.permissions).length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
-                    {r.permissions.map((p) => (
+                    {JSON.parse(r.permissions).map((p: string) => (
                       <span
                         key={p}
                         className="rounded-full border border-border/50 bg-accent/50 px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
@@ -109,7 +109,7 @@ export default async function RolesPage() {
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-3">
-                  <RoleModal role={r} />
+                  <RoleModal role={{ ...r, permissions: JSON.parse(r.permissions) }} />
                   {user.role === "SUPER_ADMIN" && !r.isSystem && (
                     <RoleActions id={r.id} roleName={r.name} />
                   )}

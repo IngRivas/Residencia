@@ -6,7 +6,6 @@ async function main() {
     where: {
       concepto: {
         contains: "Takis",
-        mode: "insensitive",
       },
     },
   })

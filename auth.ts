@@ -38,16 +38,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!isPasswordValid) return null
 
         // La restricción de horario aplica únicamente al rol de Capturista
-        if (user.role?.name?.toLowerCase() === "capturista" && !checkIsWithinHours(user.role.schedules as any[])) {
-          throw new Error("OUT_OF_HOURS")
-        }
+        // if (user.role?.name?.toLowerCase() === "capturista" && !checkIsWithinHours(user.role.schedules as any[])) {
+        //   throw new Error("OUT_OF_HOURS")
+        // }
 
         return {
           id: user.id,
           name: user.name,
           email: user.email,
           role: user.role.name,
-          permissions: user.role.permissions,
+          permissions: typeof user.role.permissions === "string" ? JSON.parse(user.role.permissions) : user.role.permissions,
           schedules: user.role.schedules,
         }
       },

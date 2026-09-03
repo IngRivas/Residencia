@@ -37,7 +37,7 @@ export async function createRole(data: {
   const role = await prisma.role.create({
     data: {
       name: roleName,
-      permissions: data.permissions,
+      permissions: JSON.stringify(data.permissions),
       isSystem: false,
     },
   })
@@ -107,7 +107,7 @@ export async function updateRole(
   }
 
   // Protect SUPER_ADMIN from losing vital permissions if they edit it themselves
-  let finalPermissions = data.permissions
+  const finalPermissions = data.permissions
   if (role.name === "SUPER_ADMIN") {
     const vital = ["manage_roles", "manage_users"]
     vital.forEach((v) => {
@@ -117,7 +117,7 @@ export async function updateRole(
 
   const updatedRole = await prisma.role.update({
     where: { id: roleId },
-    data: { permissions: finalPermissions },
+    data: { permissions: JSON.stringify(finalPermissions) },
   })
 
   await logActivity(

@@ -4,8 +4,7 @@ async function run() {
   const records = await prisma.contratistaGasto.findMany({
     where: {
       obraNombre: {
-        contains: "ABASTOS",
-        mode: "insensitive"
+        contains: "ABASTOS"
       }
     }
   });
