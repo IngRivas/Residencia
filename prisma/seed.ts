@@ -1,11 +1,12 @@
 import { PrismaClient, ObraRol, ObraEstado, GastoEstado } from "@prisma/client"
-
-import { PrismaLibSql } from "@prisma/adapter-libsql"
 import * as bcrypt from "bcryptjs"
 import "dotenv/config"
+import { Pool } from "pg"
+import { PrismaPg } from "@prisma/adapter-pg"
 
-const connectionString = process.env.DATABASE_URL || "file:./dev.db"
-const adapter = new PrismaLibSql({ url: connectionString })
+const connectionString = process.env.DATABASE_URL
+const pool = new Pool({ connectionString })
+const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
 async function main() {

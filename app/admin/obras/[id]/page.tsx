@@ -12,6 +12,8 @@ import StatCard from "@/app/components/StatCard"
 import PdfPreviewButton from "@/app/components/PdfPreviewButton"
 import { AssignMembersModal } from "@/app/components/AssignMembersModal"
 
+import { auth } from "@/auth"
+
 export const dynamic = "force-dynamic"
 
 interface ObraDetailPageProps {
@@ -25,6 +27,11 @@ export default async function ObraDetailPage({
   params: Promise<{ id: string }>
   searchParams: Promise<{ proveedor?: string }>
 }) {
+  const session = await auth()
+  if (session?.user?.email?.toLowerCase() === "prueba@gmail.com") {
+    notFound()
+  }
+
   const { id } = await params
   const sp = await searchParams
   const proveedorFilter = sp?.proveedor || ""
