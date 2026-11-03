@@ -56,7 +56,8 @@ export default function AdminDock({
 
   if (isPruebaUser) {
     links = [
-      { href: "#", label: "Obras activas", icon: Building2, exact: true },
+      { href: "/admin", label: "Obras activas", icon: Building2, exact: true },
+      { href: "/admin/proveedores", label: "Proveedores", icon: Truck },
       { href: "/admin/usuarios", label: "Usuarios", icon: Users },
     ]
   }
@@ -127,8 +128,7 @@ export default function AdminDock({
       </nav>
 
       {/* External Search Button */}
-      {!isPruebaUser && (
-        <div className="flex items-center rounded-full border border-border/50 bg-card/90 p-2 shadow-2xl backdrop-blur-xl">
+      <div className="flex items-center rounded-full border border-border/50 bg-card/90 p-2 shadow-2xl backdrop-blur-xl">
           <div className="group relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-all duration-200 hover:-translate-y-2 hover:scale-125 hover:text-foreground">
             <GlobalSearch />
             <span className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 rounded-md bg-popover px-2 py-1 text-xs font-medium whitespace-nowrap text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100">
@@ -136,7 +136,6 @@ export default function AdminDock({
             </span>
           </div>
         </div>
-      )}
 
       {/* Hidden Zoom Controls to apply zoom globally on mount */}
       <div className="hidden">

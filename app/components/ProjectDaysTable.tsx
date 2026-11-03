@@ -349,7 +349,7 @@ export default function ProjectDaysTable({
         notes[g.id] = g.notaAdmin || ""
       })
       setAdminNotes(notes)
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
     } finally {
       setLoadingExpenses(false)
@@ -731,7 +731,7 @@ export default function ProjectDaysTable({
           <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
             <DialogContent
               showCloseButton={false}
-              className="overflow-hidden border-border/50 bg-card/95 p-0 backdrop-blur-xl sm:max-w-[360px]"
+              className="w-full sm:max-w-[360px] overflow-hidden border-border/50 bg-card/95 p-0 backdrop-blur-xl"
             >
               <div className="relative flex items-center justify-center px-5 pt-5 pb-0">
                 <DialogTitle className="text-center text-base font-bold">
@@ -1869,965 +1869,7 @@ export default function ProjectDaysTable({
                                 </TableBody>
                               </Table>
 
-                              {/* Selected Expense Detail Modal */}
-                              <Dialog
-                                open={!!selectedGastoForModal}
-                                onOpenChange={(open) => {
-                                  if (!open) {
-                                    setSelectedGastoForModal(null)
-                                    setIsEditingGasto(false)
-                                  }
-                                }}
-                              >
-                                <DialogContent
-                                  showCloseButton={false}
-                                  className="gap-0 overflow-hidden bg-background p-0 sm:max-w-xl"
-                                >
-                                  {selectedGastoForModal && (
-                                    <div className="flex max-h-[85vh] flex-col">
-                                      {/* Header */}
-                                      <div className="border-b border-border bg-card p-5">
-                                        <div className="flex items-start justify-between gap-4">
-                                          <div className="min-w-0">
-                                            <DialogTitle className="mb-0.5 truncate text-lg text-foreground">
-                                              {isEditingGasto
-                                                ? "Editar Gasto"
-                                                : selectedGastoForModal.concepto}
-                                            </DialogTitle>
-                                            {!isEditingGasto && (
-                                              <p className="truncate text-sm text-muted-foreground">
-                                                {
-                                                  selectedGastoForModal.proveedor
-                                                }
-                                              </p>
-                                            )}
-                                          </div>
-                                          <div className="flex shrink-0 items-center gap-4">
-                                            <span className="text-lg font-bold text-foreground">
-                                              {formatCurrency(
-                                                Number(
-                                                  selectedGastoForModal.total
-                                                )
-                                              )}
-                                            </span>
-                                            <DialogClose className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-colors hover:bg-secondary/80 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none">
-                                              <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                strokeWidth={1.5}
-                                                stroke="currentColor"
-                                                className="h-4 w-4"
-                                              >
-                                                <path
-                                                  strokeLinecap="round"
-                                                  strokeLinejoin="round"
-                                                  d="M6 18 18 6M6 6l12 12"
-                                                />
-                                              </svg>
-                                            </DialogClose>
-                                          </div>
-                                        </div>
-                                      </div>
 
-                                      <div className="flex-1 overflow-y-auto">
-                                        {isEditingGasto ? (
-                                          /* ── EDIT MODE ── */
-                                          <form
-                                            onSubmit={async (e) => {
-                                              e.preventDefault()
-                                              if (
-                                                !editConcepto.trim() ||
-                                                !editProveedor.trim()
-                                              ) {
-                                                setAlertMsg(
-                                                  "Concepto y Proveedor son obligatorios."
-                                                )
-                                                return
-                                              }
-                                              setEditGastoLoading(true)
-                                              try {
-                                                await updateGastoAdmin(
-                                                  selectedGastoForModal.id,
-                                                  {
-                                                    concepto:
-                                                      editConcepto.trim(),
-                                                    proveedor:
-                                                      editProveedor.trim(),
-                                                    categoria:
-                                                      editCategoria.trim() ||
-                                                      undefined,
-                                                    isImprevisto:
-                                                      editIsImprevisto,
-                                                    restarPresupuesto:
-                                                      editRestarPresupuesto,
-                                                    porcentajeIVA:
-                                                      parseInt(
-                                                        editPorcentajeIVA
-                                                      ),
-                                                    total:
-                                                      parseFloat(
-                                                        editTotal.replace(
-                                                          /,/g,
-                                                          ""
-                                                        )
-                                                      ) || 0,
-                                                    notaCapturista:
-                                                      editNotaCapturista,
-                                                  }
-                                                )
-                                                // Update local modal data so it reflects changes immediately
-                                                setSelectedGastoForModal(
-                                                  (prev: any) =>
-                                                    prev
-                                                      ? {
-                                                          ...prev,
-                                                          concepto:
-                                                            editConcepto.trim(),
-                                                          proveedor:
-                                                            editProveedor.trim(),
-                                                          categoria:
-                                                            editCategoria.trim() ||
-                                                            null,
-                                                          isImprevisto:
-                                                            editIsImprevisto,
-                                                          noAfectaPresupuesto:
-                                                            !editRestarPresupuesto,
-                                                          porcentajeIVA:
-                                                            parseInt(
-                                                              editPorcentajeIVA
-                                                            ),
-                                                          total:
-                                                            parseFloat(
-                                                              editTotal.replace(
-                                                                /,/g,
-                                                                ""
-                                                              )
-                                                            ) || 0,
-                                                          notaCapturista:
-                                                            editNotaCapturista,
-                                                        }
-                                                      : null
-                                                )
-                                                setSelectedGastoForModal(null)
-                                                setIsEditingGasto(false)
-                                                if (expandedDay)
-                                                  await handleFetchExpenses(
-                                                    expandedDay
-                                                  )
-                                                sileo.success({
-                                                  title: "Éxito",
-                                                  description:
-                                                    "Cambios guardados.",
-                                                })
-                                                router.refresh()
-                                              } catch (err: any) {
-                                                sileo.error({
-                                                  title: "Error",
-                                                  description:
-                                                    err.message ||
-                                                    "Error al guardar cambios.",
-                                                })
-                                                setAlertMsg(
-                                                  err.message ||
-                                                    "Error al guardar cambios."
-                                                )
-                                              } finally {
-                                                setEditGastoLoading(false)
-                                              }
-                                            }}
-                                            className="space-y-4 p-5"
-                                          >
-                                            {/* Concepto & Total Row */}
-                                            <div className="flex gap-4">
-                                              <div className="flex-1 space-y-1.5">
-                                                <Label className="text-xs text-foreground/80">
-                                                  Concepto
-                                                </Label>
-                                                <Input
-                                                  value={editConcepto}
-                                                  onChange={(e) =>
-                                                    setEditConcepto(
-                                                      e.target.value
-                                                    )
-                                                  }
-                                                  className="h-9 border-border bg-card text-sm"
-                                                  required
-                                                  autoFocus
-                                                />
-                                              </div>
-
-                                              <div className="w-[140px] shrink-0 space-y-1.5">
-                                                <Label className="text-xs text-foreground/80">
-                                                  Importe Total
-                                                </Label>
-                                                <div className="relative">
-                                                  <span className="absolute top-1/2 left-3 -translate-y-1/2 text-sm font-medium text-muted-foreground">
-                                                    $
-                                                  </span>
-                                                  <Input
-                                                    value={editTotal}
-                                                    onChange={(e) =>
-                                                      setEditTotal(
-                                                        formatCurrencyInput(
-                                                          e.target.value
-                                                        )
-                                                      )
-                                                    }
-                                                    className="h-9 border-border bg-card pl-7 text-sm font-medium"
-                                                    required
-                                                  />
-                                                </div>
-                                              </div>
-                                            </div>
-
-                                            {/* Proveedor */}
-                                            <div className="relative space-y-1.5">
-                                              <Label className="text-xs text-foreground/80">
-                                                Proveedor
-                                              </Label>
-                                              {!editIsAddingProveedor ? (
-                                                <div className="relative">
-                                                  <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                      setEditShowProveedores(
-                                                        !editShowProveedores
-                                                      )
-                                                    }
-                                                    onBlur={() =>
-                                                      setTimeout(
-                                                        () =>
-                                                          setEditShowProveedores(
-                                                            false
-                                                          ),
-                                                        200
-                                                      )
-                                                    }
-                                                    className="flex h-9 w-full items-center justify-between rounded-md border border-border bg-card px-3 text-sm text-foreground focus:border-primary/50 focus:ring-1 focus:ring-primary/20 focus:outline-none"
-                                                  >
-                                                    <span
-                                                      className={
-                                                        editProveedor
-                                                          ? "truncate text-foreground"
-                                                          : "truncate text-muted-foreground"
-                                                      }
-                                                    >
-                                                      {editProveedor ||
-                                                        "Selecciona un proveedor..."}
-                                                    </span>
-                                                    <svg
-                                                      className="ml-2 h-4 w-4 shrink-0 opacity-50"
-                                                      xmlns="http://www.w3.org/2000/svg"
-                                                      fill="none"
-                                                      viewBox="0 0 24 24"
-                                                      strokeWidth={2}
-                                                      stroke="currentColor"
-                                                    >
-                                                      <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                                                      />
-                                                    </svg>
-                                                  </button>
-                                                  {editShowProveedores && (
-                                                    <div className="absolute top-full left-0 z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-md">
-                                                      <button
-                                                        type="button"
-                                                        className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm font-medium text-primary transition-colors hover:bg-muted"
-                                                        onClick={() => {
-                                                          setEditIsAddingProveedor(
-                                                            true
-                                                          )
-                                                          setEditProveedor("")
-                                                          setEditShowProveedores(
-                                                            false
-                                                          )
-                                                        }}
-                                                      >
-                                                        <svg
-                                                          xmlns="http://www.w3.org/2000/svg"
-                                                          fill="none"
-                                                          viewBox="0 0 24 24"
-                                                          strokeWidth={2.5}
-                                                          stroke="currentColor"
-                                                          className="h-4 w-4"
-                                                        >
-                                                          <path
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            d="M12 4.5v15m7.5-7.5h-15"
-                                                          />
-                                                        </svg>
-                                                        Agregar proveedor nuevo
-                                                      </button>
-                                                      {editProveedoresOptions.length >
-                                                        0 && (
-                                                        <div className="my-1 h-px bg-border" />
-                                                      )}
-                                                      {editProveedoresOptions.map(
-                                                        (p, i) => (
-                                                          <button
-                                                            key={`eprov-${i}`}
-                                                            type="button"
-                                                            className="w-full truncate rounded-sm px-2 py-1.5 text-left text-sm text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
-                                                            onClick={() => {
-                                                              setEditProveedor(
-                                                                p
-                                                              )
-                                                              setEditShowProveedores(
-                                                                false
-                                                              )
-                                                            }}
-                                                          >
-                                                            {p}
-                                                          </button>
-                                                        )
-                                                      )}
-                                                    </div>
-                                                  )}
-                                                </div>
-                                              ) : (
-                                                <div className="flex gap-2">
-                                                  <Input
-                                                    type="text"
-                                                    placeholder="Nombre del proveedor... (Presiona Enter)"
-                                                    value={editProveedor}
-                                                    onChange={(e) =>
-                                                      setEditProveedor(
-                                                        e.target.value
-                                                      )
-                                                    }
-                                                    onKeyDown={(e) => {
-                                                      if (e.key === "Enter") {
-                                                        e.preventDefault()
-                                                        if (
-                                                          editProveedor.trim()
-                                                        ) {
-                                                          if (
-                                                            !editProveedoresOptions.includes(
-                                                              editProveedor.trim()
-                                                            )
-                                                          ) {
-                                                            setEditProveedoresOptions(
-                                                              (prev) => [
-                                                                ...prev,
-                                                                editProveedor.trim(),
-                                                              ]
-                                                            )
-                                                          }
-                                                          setEditIsAddingProveedor(
-                                                            false
-                                                          )
-                                                        }
-                                                      }
-                                                    }}
-                                                    className="h-9 flex-1 border-border bg-card text-sm text-foreground"
-                                                    required
-                                                    autoFocus
-                                                  />
-                                                  <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    onClick={() => {
-                                                      if (
-                                                        editProveedor.trim()
-                                                      ) {
-                                                        if (
-                                                          !editProveedoresOptions.includes(
-                                                            editProveedor.trim()
-                                                          )
-                                                        ) {
-                                                          setEditProveedoresOptions(
-                                                            (prev) => [
-                                                              ...prev,
-                                                              editProveedor.trim(),
-                                                            ]
-                                                          )
-                                                        }
-                                                        setEditIsAddingProveedor(
-                                                          false
-                                                        )
-                                                      }
-                                                    }}
-                                                    className="h-9 w-9 shrink-0 border-border p-0 hover:bg-card hover:text-emerald-400"
-                                                    title="Aceptar"
-                                                  >
-                                                    <svg
-                                                      className="h-4 w-4"
-                                                      xmlns="http://www.w3.org/2000/svg"
-                                                      fill="none"
-                                                      viewBox="0 0 24 24"
-                                                      strokeWidth={2.5}
-                                                      stroke="currentColor"
-                                                    >
-                                                      <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        d="M4.5 12.75l6 6 9-13.5"
-                                                      />
-                                                    </svg>
-                                                  </Button>
-                                                  <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    onClick={() => {
-                                                      setEditIsAddingProveedor(
-                                                        false
-                                                      )
-                                                      setEditProveedor("")
-                                                    }}
-                                                    className="h-9 w-9 shrink-0 border-border p-0 hover:bg-card hover:text-rose-400"
-                                                    title="Cancelar"
-                                                  >
-                                                    <svg
-                                                      className="h-4 w-4"
-                                                      xmlns="http://www.w3.org/2000/svg"
-                                                      fill="none"
-                                                      viewBox="0 0 24 24"
-                                                      strokeWidth={2}
-                                                      stroke="currentColor"
-                                                    >
-                                                      <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        d="M6 18L18 6M6 6l12 12"
-                                                      />
-                                                    </svg>
-                                                  </Button>
-                                                </div>
-                                              )}
-                                            </div>
-
-                                            {/* Categoría */}
-                                            <div className="relative space-y-1.5">
-                                              <Label className="text-xs text-foreground/80">
-                                                Categoría{" "}
-                                                <span className="text-muted-foreground/60">
-                                                  (opcional)
-                                                </span>
-                                              </Label>
-                                              {!editIsAddingCategoria ? (
-                                                <div className="relative">
-                                                  <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                      setEditShowCategorias(
-                                                        !editShowCategorias
-                                                      )
-                                                    }
-                                                    onBlur={() =>
-                                                      setTimeout(
-                                                        () =>
-                                                          setEditShowCategorias(
-                                                            false
-                                                          ),
-                                                        200
-                                                      )
-                                                    }
-                                                    className="flex h-9 w-full items-center justify-between rounded-md border border-border bg-card px-3 text-sm text-foreground focus:border-primary/50 focus:ring-1 focus:ring-primary/20 focus:outline-none"
-                                                  >
-                                                    <span
-                                                      className={
-                                                        editCategoria
-                                                          ? "truncate text-foreground"
-                                                          : "truncate text-muted-foreground"
-                                                      }
-                                                    >
-                                                      {editCategoria ||
-                                                        "Selecciona..."}
-                                                    </span>
-                                                    <svg
-                                                      className="ml-2 h-4 w-4 shrink-0 opacity-50"
-                                                      xmlns="http://www.w3.org/2000/svg"
-                                                      fill="none"
-                                                      viewBox="0 0 24 24"
-                                                      strokeWidth={2}
-                                                      stroke="currentColor"
-                                                    >
-                                                      <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                                                      />
-                                                    </svg>
-                                                  </button>
-                                                  {editShowCategorias && (
-                                                    <div className="absolute top-full left-0 z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-md">
-                                                      <button
-                                                        type="button"
-                                                        className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm font-medium text-primary transition-colors hover:bg-muted"
-                                                        onClick={() => {
-                                                          setEditIsAddingCategoria(
-                                                            true
-                                                          )
-                                                          setEditCategoria("")
-                                                          setEditShowCategorias(
-                                                            false
-                                                          )
-                                                        }}
-                                                      >
-                                                        <svg
-                                                          xmlns="http://www.w3.org/2000/svg"
-                                                          fill="none"
-                                                          viewBox="0 0 24 24"
-                                                          strokeWidth={2.5}
-                                                          stroke="currentColor"
-                                                          className="h-4 w-4"
-                                                        >
-                                                          <path
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            d="M12 4.5v15m7.5-7.5h-15"
-                                                          />
-                                                        </svg>
-                                                        Nueva categoría
-                                                      </button>
-                                                      {editCategoriasOptions.length >
-                                                        0 && (
-                                                        <div className="my-1 h-px bg-border" />
-                                                      )}
-                                                      {editCategoriasOptions.map(
-                                                        (c, i) => (
-                                                          <button
-                                                            key={`ecat-${i}`}
-                                                            type="button"
-                                                            className="w-full truncate rounded-sm px-2 py-1.5 text-left text-sm text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
-                                                            onClick={() => {
-                                                              setEditCategoria(
-                                                                c
-                                                              )
-                                                              setEditShowCategorias(
-                                                                false
-                                                              )
-                                                            }}
-                                                          >
-                                                            {c}
-                                                          </button>
-                                                        )
-                                                      )}
-                                                    </div>
-                                                  )}
-                                                </div>
-                                              ) : (
-                                                <div className="flex gap-2">
-                                                  <Input
-                                                    type="text"
-                                                    placeholder="Nueva categoría..."
-                                                    value={editCategoria}
-                                                    onChange={(e) =>
-                                                      setEditCategoria(
-                                                        e.target.value
-                                                      )
-                                                    }
-                                                    onKeyDown={(e) => {
-                                                      if (e.key === "Enter") {
-                                                        e.preventDefault()
-                                                        if (
-                                                          editCategoria.trim()
-                                                        ) {
-                                                          if (
-                                                            !editCategoriasOptions.includes(
-                                                              editCategoria.trim()
-                                                            )
-                                                          ) {
-                                                            setEditCategoriasOptions(
-                                                              (prev) => [
-                                                                ...prev,
-                                                                editCategoria.trim(),
-                                                              ]
-                                                            )
-                                                          }
-                                                          setEditIsAddingCategoria(
-                                                            false
-                                                          )
-                                                        }
-                                                      }
-                                                    }}
-                                                    className="h-9 flex-1 border-border bg-card text-sm text-foreground"
-                                                    autoFocus
-                                                  />
-                                                  <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    onClick={() => {
-                                                      if (
-                                                        editCategoria.trim()
-                                                      ) {
-                                                        if (
-                                                          !editCategoriasOptions.includes(
-                                                            editCategoria.trim()
-                                                          )
-                                                        ) {
-                                                          setEditCategoriasOptions(
-                                                            (prev) => [
-                                                              ...prev,
-                                                              editCategoria.trim(),
-                                                            ]
-                                                          )
-                                                        }
-                                                        setEditIsAddingCategoria(
-                                                          false
-                                                        )
-                                                      }
-                                                    }}
-                                                    className="h-9 w-9 shrink-0 border-border p-0 hover:bg-card hover:text-emerald-400"
-                                                    title="Aceptar"
-                                                  >
-                                                    <svg
-                                                      className="h-4 w-4"
-                                                      xmlns="http://www.w3.org/2000/svg"
-                                                      fill="none"
-                                                      viewBox="0 0 24 24"
-                                                      strokeWidth={2.5}
-                                                      stroke="currentColor"
-                                                    >
-                                                      <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        d="M4.5 12.75l6 6 9-13.5"
-                                                      />
-                                                    </svg>
-                                                  </Button>
-                                                  <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    onClick={() => {
-                                                      setEditIsAddingCategoria(
-                                                        false
-                                                      )
-                                                      setEditCategoria("")
-                                                    }}
-                                                    className="h-9 w-9 shrink-0 border-border p-0 hover:bg-card hover:text-rose-400"
-                                                    title="Cancelar"
-                                                  >
-                                                    <svg
-                                                      className="h-4 w-4"
-                                                      xmlns="http://www.w3.org/2000/svg"
-                                                      fill="none"
-                                                      viewBox="0 0 24 24"
-                                                      strokeWidth={2}
-                                                      stroke="currentColor"
-                                                    >
-                                                      <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        d="M6 18L18 6M6 6l12 12"
-                                                      />
-                                                    </svg>
-                                                  </Button>
-                                                </div>
-                                              )}
-                                            </div>
-
-                                            {/* IVA + Imprevisto + Presupuesto */}
-                                            <div className="grid grid-cols-[1.8fr_1fr_1.2fr] gap-4">
-                                              <div className="space-y-1.5">
-                                                <Label className="text-xs text-foreground/80">
-                                                  Tasa de IVA
-                                                </Label>
-                                                <div className="flex h-9 items-center rounded-md border border-border bg-card px-1">
-                                                  {["0", "8", "16"].map(
-                                                    (pct) => (
-                                                      <label
-                                                        key={pct}
-                                                        className="flex h-7 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-sm text-xs text-foreground/80 transition-colors hover:bg-muted/50"
-                                                      >
-                                                        <input
-                                                          type="radio"
-                                                          name="editPorcentajeIVA"
-                                                          value={pct}
-                                                          checked={
-                                                            editPorcentajeIVA ===
-                                                            pct
-                                                          }
-                                                          onChange={(e) =>
-                                                            setEditPorcentajeIVA(
-                                                              e.target.value
-                                                            )
-                                                          }
-                                                          className="accent-primary"
-                                                        />
-                                                        {pct}%
-                                                      </label>
-                                                    )
-                                                  )}
-                                                </div>
-                                              </div>
-
-                                              <div className="space-y-1.5">
-                                                <Label className="text-xs text-foreground/80">
-                                                  ¿Fue Imprevisto?
-                                                </Label>
-                                                <div className="flex h-9 items-center rounded-md border border-border bg-card px-3">
-                                                  <label className="group flex w-full cursor-pointer items-center gap-2">
-                                                    <div className="relative flex items-center">
-                                                      <input
-                                                        type="checkbox"
-                                                        checked={
-                                                          editIsImprevisto
-                                                        }
-                                                        onChange={(e) =>
-                                                          setEditIsImprevisto(
-                                                            e.target.checked
-                                                          )
-                                                        }
-                                                        className="peer sr-only"
-                                                      />
-                                                      <div className="peer h-5 w-9 rounded-full bg-muted shadow-inner peer-checked:bg-rose-500 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                                                    </div>
-                                                    <span
-                                                      className={`text-sm select-none ${editIsImprevisto ? "font-medium text-rose-400" : "text-muted-foreground"}`}
-                                                    >
-                                                      {editIsImprevisto
-                                                        ? "Sí"
-                                                        : "No"}
-                                                    </span>
-                                                  </label>
-                                                </div>
-                                              </div>
-
-                                              <div className="flex flex-col justify-end space-y-1.5">
-                                                <Label className="mb-1 text-xs text-foreground/80">
-                                                  Restar del presupuesto
-                                                </Label>
-                                                <div className="flex h-9 items-center rounded-md border border-border bg-card px-3">
-                                                  <label className="group flex w-full cursor-pointer items-center gap-2">
-                                                    <div className="relative flex items-center">
-                                                      <input
-                                                        type="checkbox"
-                                                        checked={
-                                                          editRestarPresupuesto
-                                                        }
-                                                        onChange={(e) =>
-                                                          setEditRestarPresupuesto(
-                                                            e.target.checked
-                                                          )
-                                                        }
-                                                        className="peer sr-only"
-                                                      />
-                                                      <div className="peer h-5 w-9 rounded-full bg-muted shadow-inner peer-checked:bg-emerald-500 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                                                    </div>
-                                                    <span
-                                                      className={`text-sm select-none ${editRestarPresupuesto ? "font-medium text-emerald-500" : "text-muted-foreground transition-colors group-hover:text-foreground/80"}`}
-                                                    >
-                                                      {editRestarPresupuesto
-                                                        ? "Sí"
-                                                        : "No"}
-                                                    </span>
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-
-                                            {/* Nota Capturista */}
-                                            <div className="space-y-1.5">
-                                              <Label className="text-xs text-foreground/80">
-                                                Nota del Capturista
-                                              </Label>
-                                              <textarea
-                                                rows={3}
-                                                value={editNotaCapturista}
-                                                onChange={(e) =>
-                                                  setEditNotaCapturista(
-                                                    e.target.value
-                                                  )
-                                                }
-                                                placeholder="Nota aclaratoria..."
-                                                className="w-full resize-none rounded border border-border bg-card p-2 text-sm text-foreground placeholder-muted-foreground/50 outline-none focus:border-primary/50"
-                                              />
-                                            </div>
-
-                                            {/* Actions */}
-                                            <div className="flex gap-3 pt-1">
-                                              <Button
-                                                type="button"
-                                                variant="outline"
-                                                onClick={() => {
-                                                  setIsEditingGasto(false)
-                                                  setSelectedGastoForModal(null)
-                                                }}
-                                                className="flex-1"
-                                                disabled={editGastoLoading}
-                                              >
-                                                Cancelar
-                                              </Button>
-                                              <Button
-                                                type="submit"
-                                                className="flex-1"
-                                                disabled={editGastoLoading}
-                                              >
-                                                {editGastoLoading
-                                                  ? "Guardando..."
-                                                  : "Guardar Cambios"}
-                                              </Button>
-                                            </div>
-                                          </form>
-                                        ) : (
-                                          /* ── VIEW MODE ── */
-                                          <div className="space-y-5 p-5">
-                                            {/* Notes Section */}
-                                            <div className="space-y-4">
-                                              <div className="rounded-xl border border-border/50 bg-muted/40 p-3.5">
-                                                <span className="mb-1 block text-sm font-semibold text-muted-foreground">
-                                                  Nota Capturista:
-                                                </span>
-                                                <span className="text-sm text-foreground">
-                                                  {selectedGastoForModal.notaCapturista || (
-                                                    <em className="text-muted-foreground/60">
-                                                      Ninguna
-                                                    </em>
-                                                  )}
-                                                </span>
-                                              </div>
-
-                                              {/* Admin Note */}
-                                              <div className="space-y-2">
-                                                <div className="flex items-center justify-between">
-                                                  <span className="text-sm font-semibold text-muted-foreground">
-                                                    Nota Administrador:
-                                                  </span>
-                                                  {(adminNotes[
-                                                    selectedGastoForModal.id
-                                                  ] ||
-                                                    selectedGastoForModal.notaAdmin) && (
-                                                    <Button
-                                                      size="sm"
-                                                      variant="outline"
-                                                      onClick={() =>
-                                                        handleDeleteAdminNoteClick(
-                                                          selectedGastoForModal.id
-                                                        )
-                                                      }
-                                                      disabled={
-                                                        deletingNote[
-                                                          selectedGastoForModal
-                                                            .id
-                                                        ]
-                                                      }
-                                                      className="h-8 px-3 text-xs text-destructive transition-colors hover:bg-destructive/10"
-                                                    >
-                                                      {deletingNote[
-                                                        selectedGastoForModal.id
-                                                      ]
-                                                        ? "Eliminando..."
-                                                        : "Eliminar nota"}
-                                                    </Button>
-                                                  )}
-                                                </div>
-                                                <div className="flex flex-col gap-2">
-                                                  <textarea
-                                                    id={`admin-note-${selectedGastoForModal.id}`}
-                                                    rows={3}
-                                                    value={
-                                                      adminNotes[
-                                                        selectedGastoForModal.id
-                                                      ] || ""
-                                                    }
-                                                    onChange={(e) =>
-                                                      handleAdminNoteChange(
-                                                        selectedGastoForModal.id,
-                                                        e.target.value
-                                                      )
-                                                    }
-                                                    onKeyDown={(e) =>
-                                                      handleNoteKeyDown(
-                                                        e,
-                                                        selectedGastoForModal.id
-                                                      )
-                                                    }
-                                                    placeholder="Escribe una nota interna para el administrador... (Enter para guardar)"
-                                                    className="w-full resize-none rounded-xl border border-transparent bg-muted px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/30"
-                                                  />
-                                                  <div className="flex justify-end">
-                                                    <Button
-                                                      type="button"
-                                                      size="sm"
-                                                      onClick={() =>
-                                                        handleSaveAdminNote(
-                                                          selectedGastoForModal.id
-                                                        )
-                                                      }
-                                                      disabled={
-                                                        savingNote[
-                                                          selectedGastoForModal
-                                                            .id
-                                                        ]
-                                                      }
-                                                      className="px-6 shadow-sm"
-                                                    >
-                                                      {savingNote[
-                                                        selectedGastoForModal.id
-                                                      ]
-                                                        ? "Guardando..."
-                                                        : savedNote[
-                                                              selectedGastoForModal
-                                                                .id
-                                                            ]
-                                                          ? "✓ Guardado"
-                                                          : "Guardar Nota"}
-                                                    </Button>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </div>
-
-                                            {/* Photos Section */}
-                                            {selectedGastoForModal.fotos &&
-                                              selectedGastoForModal.fotos
-                                                .length > 0 && (
-                                                <div className="border-t border-border pt-2">
-                                                  <PhotoPreviewGallery
-                                                    photos={selectedGastoForModal.fotos.map(
-                                                      (f: any) => ({
-                                                        type: "uploaded" as const,
-                                                        id: f.id,
-                                                        url: f.url,
-                                                      })
-                                                    )}
-                                                    label="Comprobantes Adjuntos"
-                                                  />
-                                                </div>
-                                              )}
-                                          </div>
-                                        )}
-                                      </div>
-
-                                      {/* Footer — only in view mode */}
-                                      {!isEditingGasto && (
-                                        <div className="flex items-center justify-end gap-3 border-t border-border bg-card/50 p-4">
-                                          <Button
-                                            size="sm"
-                                            variant="outline"
-                                            onClick={() =>
-                                              handleVerifyStatus(
-                                                selectedGastoForModal.id,
-                                                "RECHAZADO"
-                                              )
-                                            }
-                                            className="border-destructive/20 font-semibold text-destructive hover:bg-destructive/10"
-                                          >
-                                            Rechazar Gasto
-                                          </Button>
-                                          <Button
-                                            size="sm"
-                                            onClick={() =>
-                                              handleVerifyStatus(
-                                                selectedGastoForModal.id,
-                                                "VERIFICADO"
-                                              )
-                                            }
-                                            className="bg-primary font-semibold text-primary-foreground"
-                                          >
-                                            Aprobar Gasto
-                                          </Button>
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                </DialogContent>
-                              </Dialog>
                             </div>
                           )}
                         </div>
@@ -2840,6 +1882,799 @@ export default function ProjectDaysTable({
           ))}
         </Tabs>
       )}
+
+      {/* Selected Expense Detail Modal */}
+      <Dialog
+        open={!!selectedGastoForModal}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedGastoForModal(null)
+            setIsEditingGasto(false)
+          }
+        }}
+      >
+        <DialogContent
+          showCloseButton={false}
+          className="w-[92vw] sm:w-full sm:max-w-xl p-0 gap-0 overflow-hidden rounded-3xl bg-card border border-border/40 shadow-2xl"
+        >
+          {selectedGastoForModal && (
+            <div className="flex flex-col max-h-[85vh] w-full min-w-0">
+              {/* Header */}
+              <div className="flex items-start justify-between gap-4 p-5 sm:p-6 border-b border-border/50 bg-muted/20 shrink-0">
+                <div className="min-w-0 flex-1">
+                  <DialogTitle className="text-lg font-bold text-foreground leading-snug line-clamp-2">
+                    {isEditingGasto
+                      ? "Editar Gasto"
+                      : selectedGastoForModal.concepto}
+                  </DialogTitle>
+                  {!isEditingGasto && (
+                    <p className="mt-1 text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide truncate">
+                      {selectedGastoForModal.proveedor}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="text-sm sm:text-base font-bold text-foreground bg-background px-3 py-1 rounded-full border border-border/40 shadow-xs whitespace-nowrap">
+                    {formatCurrency(Number(selectedGastoForModal.total))}
+                  </span>
+                  <DialogClose className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="h-4 w-4"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18 18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </DialogClose>
+                </div>
+              </div>
+
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto min-w-0 p-5 sm:p-6">
+                {isEditingGasto ? (
+                  /* ── EDIT MODE ── */
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault()
+                      if (!editConcepto.trim() || !editProveedor.trim()) {
+                        setAlertMsg("Concepto y Proveedor son obligatorios.")
+                        return
+                      }
+                      setEditGastoLoading(true)
+                      try {
+                        await updateGastoAdmin(selectedGastoForModal.id, {
+                          concepto: editConcepto.trim(),
+                          proveedor: editProveedor.trim(),
+                          categoria: editCategoria.trim() || undefined,
+                          isImprevisto: editIsImprevisto,
+                          restarPresupuesto: editRestarPresupuesto,
+                          porcentajeIVA: parseInt(editPorcentajeIVA),
+                          total:
+                            parseFloat(editTotal.replace(/,/g, "")) || 0,
+                          notaCapturista: editNotaCapturista,
+                        })
+                        setSelectedGastoForModal((prev: any) =>
+                          prev
+                            ? {
+                                ...prev,
+                                concepto: editConcepto.trim(),
+                                proveedor: editProveedor.trim(),
+                                categoria: editCategoria.trim() || null,
+                                isImprevisto: editIsImprevisto,
+                                noAfectaPresupuesto: !editRestarPresupuesto,
+                                porcentajeIVA: parseInt(editPorcentajeIVA),
+                                total:
+                                  parseFloat(editTotal.replace(/,/g, "")) || 0,
+                                notaCapturista: editNotaCapturista,
+                              }
+                            : null
+                        )
+                        setSelectedGastoForModal(null)
+                        setIsEditingGasto(false)
+                        if (expandedDay) await handleFetchExpenses(expandedDay)
+                        sileo.success({
+                          title: "Éxito",
+                          description: "Cambios guardados.",
+                        })
+                        router.refresh()
+                      } catch (err: any) {
+                        sileo.error({
+                          title: "Error",
+                          description:
+                            err.message || "Error al guardar cambios.",
+                        })
+                        setAlertMsg(
+                          err.message || "Error al guardar cambios."
+                        )
+                      } finally {
+                        setEditGastoLoading(false)
+                      }
+                    }}
+                    className="space-y-4"
+                  >
+                    {/* Concepto & Total */}
+                    <div className="grid grid-cols-1 sm:grid-cols-[1fr_150px] gap-4">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-foreground/80">
+                          Concepto
+                        </Label>
+                        <Input
+                          value={editConcepto}
+                          onChange={(e) => setEditConcepto(e.target.value)}
+                          className="h-9 border-border bg-card text-sm"
+                          required
+                          autoFocus
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-foreground/80">
+                          Importe Total
+                        </Label>
+                        <div className="relative">
+                          <span className="absolute top-1/2 left-3 -translate-y-1/2 text-sm font-medium text-muted-foreground">
+                            $
+                          </span>
+                          <Input
+                            value={editTotal}
+                            onChange={(e) =>
+                              setEditTotal(
+                                formatCurrencyInput(e.target.value)
+                              )
+                            }
+                            className="h-9 border-border bg-card pl-7 text-sm font-medium"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Proveedor */}
+                    <div className="relative space-y-1.5">
+                      <Label className="text-xs text-foreground/80">
+                        Proveedor
+                      </Label>
+                      {!editIsAddingProveedor ? (
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setEditShowProveedores(!editShowProveedores)
+                            }
+                            onBlur={() =>
+                              setTimeout(
+                                () => setEditShowProveedores(false),
+                                200
+                              )
+                            }
+                            className="flex h-9 w-full items-center justify-between rounded-md border border-border bg-card px-3 text-sm text-foreground focus:border-primary/50 focus:ring-1 focus:ring-primary/20 focus:outline-none"
+                          >
+                            <span
+                              className={
+                                editProveedor
+                                  ? "truncate text-foreground"
+                                  : "truncate text-muted-foreground"
+                              }
+                            >
+                              {editProveedor || "Selecciona un proveedor..."}
+                            </span>
+                            <svg
+                              className="ml-2 h-4 w-4 shrink-0 opacity-50"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                              />
+                            </svg>
+                          </button>
+                          {editShowProveedores && (
+                            <div className="absolute top-full left-0 z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-md">
+                              <button
+                                type="button"
+                                className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm font-medium text-primary transition-colors hover:bg-muted"
+                                onClick={() => {
+                                  setEditIsAddingProveedor(true)
+                                  setEditProveedor("")
+                                  setEditShowProveedores(false)
+                                }}
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={2.5}
+                                  stroke="currentColor"
+                                  className="h-4 w-4"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M12 4.5v15m7.5-7.5h-15"
+                                  />
+                                </svg>
+                                Agregar proveedor nuevo
+                              </button>
+                              {editProveedoresOptions.length > 0 && (
+                                <div className="my-1 h-px bg-border" />
+                              )}
+                              {editProveedoresOptions.map((p, i) => (
+                                <button
+                                  key={`eprov-${i}`}
+                                  type="button"
+                                  className="w-full truncate rounded-sm px-2 py-1.5 text-left text-sm text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+                                  onClick={() => {
+                                    setEditProveedor(p)
+                                    setEditShowProveedores(false)
+                                  }}
+                                >
+                                  {p}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <Input
+                            type="text"
+                            placeholder="Nombre del proveedor... (Presiona Enter)"
+                            value={editProveedor}
+                            onChange={(e) => setEditProveedor(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault()
+                                if (editProveedor.trim()) {
+                                  if (
+                                    !editProveedoresOptions.includes(
+                                      editProveedor.trim()
+                                    )
+                                  ) {
+                                    setEditProveedoresOptions((prev) => [
+                                      ...prev,
+                                      editProveedor.trim(),
+                                    ])
+                                  }
+                                  setEditIsAddingProveedor(false)
+                                }
+                              }
+                            }}
+                            className="h-9 flex-1 border-border bg-card text-sm text-foreground"
+                            required
+                            autoFocus
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              if (editProveedor.trim()) {
+                                if (
+                                  !editProveedoresOptions.includes(
+                                    editProveedor.trim()
+                                  )
+                                ) {
+                                  setEditProveedoresOptions((prev) => [
+                                    ...prev,
+                                    editProveedor.trim(),
+                                  ])
+                                }
+                                setEditIsAddingProveedor(false)
+                              }
+                            }}
+                            className="h-9 w-9 shrink-0 border-border p-0 hover:bg-card hover:text-emerald-400"
+                            title="Aceptar"
+                          >
+                            <svg
+                              className="h-4 w-4"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2.5}
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M4.5 12.75l6 6 9-13.5"
+                              />
+                            </svg>
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              setEditIsAddingProveedor(false)
+                              setEditProveedor("")
+                            }}
+                            className="h-9 w-9 shrink-0 border-border p-0 hover:bg-card hover:text-rose-400"
+                            title="Cancelar"
+                          >
+                            <svg
+                              className="h-4 w-4"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Categoría */}
+                    <div className="relative space-y-1.5">
+                      <Label className="text-xs text-foreground/80">
+                        Categoría{" "}
+                        <span className="text-muted-foreground/60">
+                          (opcional)
+                        </span>
+                      </Label>
+                      {!editIsAddingCategoria ? (
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setEditShowCategorias(!editShowCategorias)
+                            }
+                            onBlur={() =>
+                              setTimeout(
+                                () => setEditShowCategorias(false),
+                                200
+                              )
+                            }
+                            className="flex h-9 w-full items-center justify-between rounded-md border border-border bg-card px-3 text-sm text-foreground focus:border-primary/50 focus:ring-1 focus:ring-primary/20 focus:outline-none"
+                          >
+                            <span
+                              className={
+                                editCategoria
+                                  ? "truncate text-foreground"
+                                  : "truncate text-muted-foreground"
+                              }
+                            >
+                              {editCategoria || "Selecciona..."}
+                            </span>
+                            <svg
+                              className="ml-2 h-4 w-4 shrink-0 opacity-50"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                              />
+                            </svg>
+                          </button>
+                          {editShowCategorias && (
+                            <div className="absolute top-full left-0 z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-md">
+                              <button
+                                type="button"
+                                className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm font-medium text-primary transition-colors hover:bg-muted"
+                                onClick={() => {
+                                  setEditIsAddingCategoria(true)
+                                  setEditCategoria("")
+                                  setEditShowCategorias(false)
+                                }}
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={2.5}
+                                  stroke="currentColor"
+                                  className="h-4 w-4"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M12 4.5v15m7.5-7.5h-15"
+                                  />
+                                </svg>
+                                Nueva categoría
+                              </button>
+                              {editCategoriasOptions.length > 0 && (
+                                <div className="my-1 h-px bg-border" />
+                              )}
+                              {editCategoriasOptions.map((c, i) => (
+                                <button
+                                  key={`ecat-${i}`}
+                                  type="button"
+                                  className="w-full truncate rounded-sm px-2 py-1.5 text-left text-sm text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+                                  onClick={() => {
+                                    setEditCategoria(c)
+                                    setEditShowCategorias(false)
+                                  }}
+                                >
+                                  {c}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <Input
+                            type="text"
+                            placeholder="Nueva categoría..."
+                            value={editCategoria}
+                            onChange={(e) => setEditCategoria(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault()
+                                if (editCategoria.trim()) {
+                                  if (
+                                    !editCategoriasOptions.includes(
+                                      editCategoria.trim()
+                                    )
+                                  ) {
+                                    setEditCategoriasOptions((prev) => [
+                                      ...prev,
+                                      editCategoria.trim(),
+                                    ])
+                                  }
+                                  setEditIsAddingCategoria(false)
+                                }
+                              }
+                            }}
+                            className="h-9 flex-1 border-border bg-card text-sm text-foreground"
+                            autoFocus
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              if (editCategoria.trim()) {
+                                if (
+                                  !editCategoriasOptions.includes(
+                                    editCategoria.trim()
+                                  )
+                                ) {
+                                  setEditCategoriasOptions((prev) => [
+                                    ...prev,
+                                    editCategoria.trim(),
+                                  ])
+                                }
+                                setEditIsAddingCategoria(false)
+                              }
+                            }}
+                            className="h-9 w-9 shrink-0 border-border p-0 hover:bg-card hover:text-emerald-400"
+                            title="Aceptar"
+                          >
+                            <svg
+                              className="h-4 w-4"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2.5}
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M4.5 12.75l6 6 9-13.5"
+                              />
+                            </svg>
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              setEditIsAddingCategoria(false)
+                              setEditCategoria("")
+                            }}
+                            className="h-9 w-9 shrink-0 border-border p-0 hover:bg-card hover:text-rose-400"
+                            title="Cancelar"
+                          >
+                            <svg
+                              className="h-4 w-4"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* IVA + Imprevisto + Presupuesto */}
+                    <div className="grid grid-cols-1 sm:grid-cols-[1.8fr_1fr_1.2fr] gap-4">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-foreground/80">
+                          Tasa de IVA
+                        </Label>
+                        <div className="flex h-9 items-center rounded-md border border-border bg-card px-1">
+                          {["0", "8", "16"].map((pct) => (
+                            <label
+                              key={pct}
+                              className="flex h-7 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-sm text-xs text-foreground/80 transition-colors hover:bg-muted/50"
+                            >
+                              <input
+                                type="radio"
+                                name="editPorcentajeIVA"
+                                value={pct}
+                                checked={editPorcentajeIVA === pct}
+                                onChange={(e) =>
+                                  setEditPorcentajeIVA(e.target.value)
+                                }
+                                className="accent-primary"
+                              />
+                              {pct}%
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-foreground/80">
+                          ¿Fue Imprevisto?
+                        </Label>
+                        <div className="flex h-9 items-center rounded-md border border-border bg-card px-3">
+                          <label className="group flex w-full cursor-pointer items-center gap-2">
+                            <div className="relative flex items-center">
+                              <input
+                                type="checkbox"
+                                checked={editIsImprevisto}
+                                onChange={(e) =>
+                                  setEditIsImprevisto(e.target.checked)
+                                }
+                                className="peer sr-only"
+                              />
+                              <div className="peer h-5 w-9 rounded-full bg-muted shadow-inner peer-checked:bg-rose-500 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                            </div>
+                            <span
+                              className={`text-sm select-none ${editIsImprevisto ? "font-medium text-rose-400" : "text-muted-foreground"}`}
+                            >
+                              {editIsImprevisto ? "Sí" : "No"}
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col justify-end space-y-1.5">
+                        <Label className="mb-1 text-xs text-foreground/80">
+                          Restar del presupuesto
+                        </Label>
+                        <div className="flex h-9 items-center rounded-md border border-border bg-card px-3">
+                          <label className="group flex w-full cursor-pointer items-center gap-2">
+                            <div className="relative flex items-center">
+                              <input
+                                type="checkbox"
+                                checked={editRestarPresupuesto}
+                                onChange={(e) =>
+                                  setEditRestarPresupuesto(e.target.checked)
+                                }
+                                className="peer sr-only"
+                              />
+                              <div className="peer h-5 w-9 rounded-full bg-muted shadow-inner peer-checked:bg-emerald-500 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                            </div>
+                            <span
+                              className={`text-sm select-none ${editRestarPresupuesto ? "font-medium text-emerald-500" : "text-muted-foreground transition-colors group-hover:text-foreground/80"}`}
+                            >
+                              {editRestarPresupuesto ? "Sí" : "No"}
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Nota Capturista */}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-foreground/80">
+                        Nota del Capturista
+                      </Label>
+                      <textarea
+                        rows={3}
+                        value={editNotaCapturista}
+                        onChange={(e) =>
+                          setEditNotaCapturista(e.target.value)
+                        }
+                        placeholder="Nota aclaratoria..."
+                        className="w-full resize-none rounded-xl border border-border bg-card p-2 text-sm text-foreground placeholder-muted-foreground/50 outline-none focus:border-primary/50"
+                      />
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-3 pt-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setIsEditingGasto(false)
+                          setSelectedGastoForModal(null)
+                        }}
+                        className="flex-1 h-10"
+                        disabled={editGastoLoading}
+                      >
+                        Cancelar
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="flex-1 h-10"
+                        disabled={editGastoLoading}
+                      >
+                        {editGastoLoading
+                          ? "Guardando..."
+                          : "Guardar Cambios"}
+                      </Button>
+                    </div>
+                  </form>
+                ) : (
+                  /* ── VIEW MODE ── */
+                  <div className="space-y-5">
+                    {/* Nota Capturista */}
+                    <div className="rounded-2xl border border-border/50 bg-muted/20 p-4 space-y-1.5">
+                      <span className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Nota Capturista:
+                      </span>
+                      <p className="text-sm text-foreground leading-relaxed break-words">
+                        {selectedGastoForModal.notaCapturista || (
+                          <em className="text-muted-foreground/60">
+                            Ninguna
+                          </em>
+                        )}
+                      </p>
+                    </div>
+
+                    {/* Nota Administrador */}
+                    <div className="rounded-2xl border border-border/50 bg-muted/20 p-4 space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                          Nota Administrador:
+                        </span>
+                        {(adminNotes[selectedGastoForModal.id] ||
+                          selectedGastoForModal.notaAdmin) && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() =>
+                              handleDeleteAdminNoteClick(
+                                selectedGastoForModal.id
+                              )
+                            }
+                            disabled={
+                              deletingNote[selectedGastoForModal.id]
+                            }
+                            className="h-7 px-2.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            {deletingNote[selectedGastoForModal.id]
+                              ? "Eliminando..."
+                              : "Eliminar nota"}
+                          </Button>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <textarea
+                          id={`admin-note-${selectedGastoForModal.id}`}
+                          rows={3}
+                          value={
+                            adminNotes[selectedGastoForModal.id] || ""
+                          }
+                          onChange={(e) =>
+                            handleAdminNoteChange(
+                              selectedGastoForModal.id,
+                              e.target.value
+                            )
+                          }
+                          onKeyDown={(e) =>
+                            handleNoteKeyDown(
+                              e,
+                              selectedGastoForModal.id
+                            )
+                          }
+                          placeholder="Escribe una nota interna para el administrador... (Enter para guardar)"
+                          className="w-full resize-none rounded-xl border border-border/60 bg-background/90 p-3 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
+                        />
+                        <div className="flex justify-end">
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={() =>
+                              handleSaveAdminNote(
+                                selectedGastoForModal.id
+                              )
+                            }
+                            disabled={
+                              savingNote[selectedGastoForModal.id]
+                            }
+                            className="h-8 px-4 text-xs font-semibold shadow-xs"
+                          >
+                            {savingNote[selectedGastoForModal.id]
+                              ? "Guardando..."
+                              : savedNote[selectedGastoForModal.id]
+                              ? "✓ Guardado"
+                              : "Guardar Nota"}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Photos Section */}
+                    {selectedGastoForModal.fotos &&
+                      selectedGastoForModal.fotos.length > 0 && (
+                        <div className="space-y-2 pt-1">
+                          <PhotoPreviewGallery
+                            photos={selectedGastoForModal.fotos.map(
+                              (f: any) => ({
+                                type: "uploaded",
+                                id: f.id,
+                                url: f.url,
+                              })
+                            )}
+                            label="Comprobantes Adjuntos"
+                          />
+                        </div>
+                      )}
+                  </div>
+                )}
+              </div>
+
+              {/* Footer — only in view mode */}
+              {!isEditingGasto && (
+                <div className="p-4 sm:p-5 border-t border-border/50 bg-muted/20 shrink-0">
+                  <div className="flex items-center gap-3">
+                    <Button
+                      size="default"
+                      variant="outline"
+                      onClick={() =>
+                        handleVerifyStatus(
+                          selectedGastoForModal.id,
+                          "RECHAZADO"
+                        )
+                      }
+                      className="flex-1 h-10 border-destructive/30 font-semibold text-destructive hover:bg-destructive/10 hover:border-destructive/50"
+                    >
+                      Rechazar Gasto
+                    </Button>
+                    <Button
+                      size="default"
+                      onClick={() =>
+                        handleVerifyStatus(
+                          selectedGastoForModal.id,
+                          "VERIFICADO"
+                        )
+                      }
+                      className="flex-1 h-10 bg-primary font-semibold text-primary-foreground shadow-xs hover:bg-primary/90"
+                    >
+                      Aprobar Gasto
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Add Day Modal */}
       <Dialog open={isAddDayOpen} onOpenChange={setIsAddDayOpen}>

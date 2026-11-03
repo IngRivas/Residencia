@@ -18,7 +18,7 @@ async function requireAdmin() {
   const session = await auth()
   if (!session?.user) throw new Error("No autenticado")
   const role = (session.user as any).role
-  if (role !== "SUPER_ADMIN" && role !== "ADMIN") {
+  if (role !== "SUPER_ADMIN" && role !== "ADMIN" && role !== "ADMINISTRADOR") {
     throw new Error("No autorizado")
   }
   return session.user
@@ -668,6 +668,8 @@ export async function verifyGastosBatchWithAI(obraId: string) {
 
   for (const gasto of gastosPendientes) {
     if (!gasto.fotos || gasto.fotos.length === 0) continue
+
+    if (procesados > 0) await new Promise((r) => setTimeout(r, 1500));
 
     const imageUrls = gasto.fotos.map(f => f.url)
     const aiResult = await verifyExpenseWithAI(

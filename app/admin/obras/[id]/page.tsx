@@ -12,7 +12,6 @@ import StatCard from "@/app/components/StatCard"
 import PdfPreviewButton from "@/app/components/PdfPreviewButton"
 import { AssignMembersModal } from "@/app/components/AssignMembersModal"
 
-import { auth } from "@/auth"
 
 export const dynamic = "force-dynamic"
 
@@ -27,10 +26,6 @@ export default async function ObraDetailPage({
   params: Promise<{ id: string }>
   searchParams: Promise<{ proveedor?: string }>
 }) {
-  const session = await auth()
-  if (session?.user?.email?.toLowerCase() === "prueba@gmail.com") {
-    notFound()
-  }
 
   const { id } = await params
   const sp = await searchParams
@@ -70,15 +65,25 @@ export default async function ObraDetailPage({
     notFound()
   }
 
-  const availableUsers = await prisma.user.findMany({
-    orderBy: { name: "asc" },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: { select: { name: true } },
-    },
-  })
+  let availableUsers: {
+    id: string
+    name: string | null
+    email: string
+    role: { name: string } | null
+  }[] = []
+  try {
+    availableUsers = await prisma.user.findMany({
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: { select: { name: true } },
+      },
+    })
+  } catch (err) {
+    console.error("Error al obtener usuarios disponibles:", err)
+  }
 
   // Helper: returns true if a gasto was created by an admin (should not count toward budget)
   const isAdminGasto = (gasto: any) => {
