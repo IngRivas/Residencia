@@ -11,7 +11,6 @@ import {
   Trash2,
   Truck,
   MoreVertical,
-  ReceiptText,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -38,29 +37,21 @@ export default function AdminDock({
 }: AdminDockProps) {
   const pathname = usePathname()
 
-  const isPruebaUser = user?.email?.toLowerCase() === "prueba@gmail.com"
+  const isAdmin = ["SUPER_ADMIN", "ADMIN", "ADMINISTRADOR"].includes(role?.toUpperCase())
 
-  let links = [
+  const links = [
     { href: "/admin", label: "Obras activas", icon: Building2, exact: true },
-    ...(["SUPER_ADMIN", "ADMIN"].includes(role)
+    ...(isAdmin
       ? [
           { href: "/admin/proveedores", label: "Proveedores", icon: Truck },
           { href: "/admin/usuarios", label: "Usuarios", icon: Users },
         ]
       : []),
     { href: "/admin/archivo", label: "Archivo de obras", icon: FolderArchive },
-    ...(["SUPER_ADMIN", "ADMIN"].includes(role)
+    ...(isAdmin
       ? [{ href: "/admin/papelera", label: "Papelera", icon: Trash2 }]
       : []),
   ]
-
-  if (isPruebaUser) {
-    links = [
-      { href: "/admin", label: "Obras activas", icon: Building2, exact: true },
-      { href: "/admin/proveedores", label: "Proveedores", icon: Truck },
-      { href: "/admin/usuarios", label: "Usuarios", icon: Users },
-    ]
-  }
 
   return (
     <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4">

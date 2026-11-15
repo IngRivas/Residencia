@@ -15,19 +15,7 @@ export async function GET() {
       }
     }
 
-    const contratistas = await prisma.contratistaGasto.findMany()
-    let cCount = 0
-    for (const c of contratistas) {
-      if (c.obraNombre && c.obraNombre !== c.obraNombre.toUpperCase()) {
-        await prisma.contratistaGasto.update({
-          where: { id: c.id },
-          data: { obraNombre: c.obraNombre.toUpperCase() }
-        })
-        cCount++
-      }
-    }
-
-    return NextResponse.json({ success: true, count, cCount })
+    return NextResponse.json({ success: true, count })
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })
   }

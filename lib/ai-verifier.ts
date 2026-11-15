@@ -100,8 +100,12 @@ Debes responder ÚNICAMENTE con un objeto JSON válido, sin bloques de código m
 }
 `;
 
-  // 3. Llamar a gemini-3.5-flash-lite (óptimo, rápido y estable)
-  const modelsToTry = ["gemini-3.5-flash-lite", "gemini-3.5-flash"];
+  // 3. Llamar a modelos de Gemini disponibles (1.5 Flash -> 2.0 Flash -> 1.5 Pro)
+  const modelsToTry = [
+    "gemini-1.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-pro",
+  ];
   let lastError: any = null;
 
   for (const modelName of modelsToTry) {
